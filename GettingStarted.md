@@ -1,20 +1,20 @@
-Introduction to octodeploy pwsh module
+Introduction to OctopusDeploy pwsh module
 ---
 ## Getting Started
-Octodeploy is a cross-platform module to interact with octopus deploy. It can be used with Windows PowerShell > 5.1 or PowerShell > 7 on Windows, Linux or Mac.
-The module is not feature complete, and commands are added as needed. Downwards compatibility cannot be guarantied.  
+OctopusDeploy is a cross-platform module to interact with octopus deploy. It can be used with Windows PowerShell > 5.1 or PowerShell > 7 on Windows, Linux or Mac.
+The module is not feature complete, and commands are added as needed. Downwards compatibility cannot be guarantied.
 
 ---
 ##### Install module
 
 ```powershell
-Install-Module octodeploy -Scope CurrentUser -Repository PSGallery-group
+Install-Module OctopusDeploy -Scope CurrentUser -Repository PSGallery-group
 ```
 
 _or_
 
 ```Powershell
-Update-Module octodeploy 
+Update-Module OctopusDeploy
 ```
 ---
 ##### Connect to an octopus instance
@@ -34,20 +34,20 @@ ___
 Set-ConnectionConfiguration -OctopusServerURL https://octo.medavis.com -ApiKey ($APIKEY | ConvertTo-SecureString -AsPlainText -Force)
 ```
 ---
-##### Check saved configuration 
+##### Check saved configuration
 
 ```powershell
 Get-ConnectionConfiguration
 ```
 There is no need for connect-octopus with saved config as it happens implicitly when importing module or using any cmdlet
 ___
-#####  Checking connection 
+#####  Checking connection
 
 ```powershell
 Test-OctopusConnection
 ```
 ---
-##### Check current space and switching space 
+##### Check current space and switching space
 ```powershell
 Get-CurrentSpace
 Set-Space -Name DevOps
@@ -103,7 +103,7 @@ Get-Tenant
 ---
 ### Use tags to filter tenants
 ---
-#### Find existing tags 
+#### Find existing tags
 ```powershell
 Get-TagSet
 Get-TagSet -CanonicalTagName
@@ -203,7 +203,7 @@ Get-ProjectTenantVariable -Project "install RS" -Tenant XXROM001 -Environment Pr
 #### Common variables
 For common variables, you need to know the variable's set name. Without you will get all common.
 ```powershell
-Get-CommonVariable -VariableSet 
+Get-CommonVariable -VariableSet
 ```
 
 ```powershell
@@ -213,7 +213,7 @@ Get-CommonVariable -VariableSet
 ```powershell
 Get-CommonVariable -VariableSet 'Customer Variables'
 ```
-Variableset paramerter can autocomplete 
+Variableset paramerter can autocomplete
 
 #### Common tenant variables
 Just like common variables, common tenant variables also expect a variable set name
@@ -221,8 +221,8 @@ Just like common variables, common tenant variables also expect a variable set n
 Get-CommonTenantVariable -VariableSet 'Customer Variables' -Tenant ATATT01R
 ```
 
-### Writing variables 
-current only common tenant variables are supported 
+### Writing variables
+current only common tenant variables are supported
 #### Writing a single common tenant variable
 
 ```powershell
@@ -238,27 +238,27 @@ Set-CommonTenantVariable -Tenant XXROM001 -VariableSet 'Customer Variables' -Nam
 Set-CommonTenantVariable -Tenant XXROM001 -VariableSet 'Customer Variables' -Name Unlocode -Value ""
 ```
 
-#### Writing a multiple variables using a hashtable 
+#### Writing a multiple variables using a hashtable
 ```powershell
 $params = @{Unlocode                     = "bla1"
     'Server.Ris.Database.IP[Production]' = "blup1"
     'Password.User.medavis'              = "XXXXPA1XXXX"
 }
-Set-CommonTenantVariable -Tenant XXROM001 -VariableSet 'Customer Variables' -VariableHash $params 
+Set-CommonTenantVariable -Tenant XXROM001 -VariableSet 'Customer Variables' -VariableHash $params
 ```
 
 ## Adding/removing roles
 
 #### Adding role to machine
 ```powershell
-Get-Machine -name XXROM001-SESUP001-VM-DE | Add-RoleToMachine -Role riscomserver   
+Get-Machine -name XXROM001-SESUP001-VM-DE | Add-RoleToMachine -Role riscomserver
 ```
 ```powershell
 Add-RoleToMachine -Role default -Machine XXROM001-SESUP001-VM-DE
 ```
 #### Remove roles from machine
 ```powershell
-Get-Machine -name XXROM001-SESUP001-VM-DE | Remove-RoleFromMachine -Role riscomserver, default 
+Get-Machine -name XXROM001-SESUP001-VM-DE | Remove-RoleFromMachine -Role riscomserver, default
 ```
 ## Adding/removing tags to tenants
 ```powerhsell
@@ -277,34 +277,34 @@ Add-ProjectToTenant -Project 'Install Solution' -Environment Development, Test, 
 ```powershell
 Add-ProjectToTenant -Project 'Install Solution' -Environment Development,Test -Tenant XXROMDOC -Verbose
 # or
-Remove-ProjectFromTenant -Project 'Install Solution' -Tenant XXROMDOC -Verbose 
+Remove-ProjectFromTenant -Project 'Install Solution' -Tenant XXROMDOC -Verbose
 ```
 
 ## Deployments
 #### List of all deployment of a defined release
 ```Powershell
-Get-Deployment -Release (Get-Release -Project 'Configure RIS Server' -Latest -Channel default) 
+Get-Deployment -Release (Get-Release -Project 'Configure RIS Server' -Latest -Channel default)
 ```
 #### Invoke a deployment
 ```Powershell
 $release = Get-release -Project 'Test Project' -Latest
-$tenant = Get-Tenant -name XXROM001  
+$tenant = Get-Tenant -name XXROM001
 Invoke-Deployment -Release $release -Environment Development -Tenant $tenant -QueueTime (get-date).AddMinutes(3)
 ```
 ## Runbooks
 Getting a list of all runbooks
 ```Powershell
- Get-Runbook | select name, projectid | Sort-Object 
+ Get-Runbook | select name, projectid | Sort-Object
 ```
 With project names
 ```Powershell
-Get-Runbook | select name, @{n="projectName";e={Get-Project -id $_.ProjectId | Select-Object -ExpandProperty name}} 
+Get-Runbook | select name, @{n="projectName";e={Get-Project -id $_.ProjectId | Select-Object -ExpandProperty name}}
 ```
 
 Get all runbooks of a project
 ```Powershell
-Get-Runbook -Project 'Test Project'   
-```   
+Get-Runbook -Project 'Test Project'
+```
 Runbooks are like projects and runbooksnapshots are like releases
 ```Powershell
 Get-Runbook -Project 'Test Project' -name artifact | Get-RunbookSnapshot | select name, Assembled
@@ -324,8 +324,8 @@ Invoke-RunbookRun -RunbookSnapshot "RunbookSnapshots-1541" -Tenant XXROM001  -En
 Get-Artifact
 ```
 Getting all artifacts regarding a runbook run
-```Powershell 
-Get-Runbook -Name artifact | get-RunbookSnapshot  | Get-Artifact 
+```Powershell
+Get-Runbook -Name artifact | get-RunbookSnapshot  | Get-Artifact
 ```
 Retrieving the content of an artifact
 ```Powershell
@@ -337,5 +337,5 @@ Get-Artifact | Select-Object -First 1 | Get-ArtifactContent -Encoding Unicode
 Remove-Artifact -Artifact "Artifacts-105802"
 ```
 ```Powershell
-Get-Artifact | Select-Object -First 1 | Remove-Artifact   
+Get-Artifact | Select-Object -First 1 | Remove-Artifact
 ```
