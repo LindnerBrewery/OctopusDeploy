@@ -11,16 +11,19 @@
     }
 
     'psake'               = @{
-        Version = '4.8.0'
+        Version = '4.9.0'
     }
     'Configuration'       = @{
         Version = 'latest'
     }
     'BuildHelpers'        = @{
-        Version = '2.0.11'
+        Version = '2.0.16'
     }
     'PowerShellBuild'     = @{
-        Version = '0.4.0'
+        Version = '0.6.1'
+    }
+    'PSScriptAnalyzer' = @{
+        Version = '1.19.1'
     }
     'Octopus.Client'      = @{
         DependencyType = 'Package'
@@ -33,8 +36,8 @@
         DependencyType = 'Command'
         Source         = '$octoClient = (Get-Childitem $DependencyFolder\dependencies\Octopus.Client.* | Sort-Object -Property @{e={[version]$_.name.replace("Octopus.Client.","")}} -Descending | Select -first 1).fullname;
         Write-host $octoClient
-        Copy-item $octoClient\lib\net462\Octopus.Client.dll $DependencyFolder\OctoDeploy\Lib\Desktop\Octopus.Client.dll -force -verbose;
-        Copy-item $octoClient\lib\netstandard2.0\Octopus.Client.dll $DependencyFolder\OctoDeploy\Lib\Core\Octopus.Client.dll -force -verbose'
+        Copy-item $octoClient\lib\net462\Octopus.Client.dll $DependencyFolder\OctopusDeploy\Lib\Desktop\Octopus.Client.dll -force -verbose;
+        Copy-item $octoClient\lib\netstandard2.0\Octopus.Client.dll $DependencyFolder\OctopusDeploy\Lib\Core\Octopus.Client.dll -force -verbose'
         DependsOn      = 'Octopus.Client'
     }
     'gitversion' = @{

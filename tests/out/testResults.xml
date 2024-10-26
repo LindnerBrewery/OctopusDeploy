@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="17" errors="0" failures="12" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2024-10-26" time="16:16:44">
+  <environment user-domain="DESKTOP" nunit-version="2.5.8.0" platform="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk0\Partition3" os-version="10.0.26120" user="emrys" machine-name="DESKTOP" clr-version="8.0.10" cwd="C:\Git\OctopusDeploy\tests" />
+  <culture-info current-culture="en-US" current-uiculture="en-US" />
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Failure" success="False" time="16.5795" asserts="0" description="Pester">
+    <results>
+      <test-suite type="TestFixture" name="C:\Git\OctopusDeploy\tests\Get-CustomError.Tests.ps1" executed="True" result="Success" success="True" time="0.856" asserts="0" description="C:\Git\OctopusDeploy\tests\Get-CustomError.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Get-CustomError" executed="True" result="Success" success="True" time="0.2606" asserts="0" description="Get-CustomError">
+            <results>
+              <test-suite type="TestFixture" name="Get-CustomError.Basic tests" executed="True" result="Success" success="True" time="0.2456" asserts="0" description="Get-CustomError.Basic tests">
+                <results>
+                  <test-case description="Test output type: System.Management.Automation.ErrorRecord" name="Get-CustomError.Basic tests.Test output type: System.Management.Automation.ErrorRecord" time="0.1172" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Test Exception.Message" name="Get-CustomError.Basic tests.Test Exception.Message" time="0.0416" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Test Exception type: System.IO.FileLoadException" name="Get-CustomError.Basic tests.Test Exception type: System.IO.FileLoadException" time="0.0136" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Test TargetObject value" name="Get-CustomError.Basic tests.Test TargetObject value" time="0.0124" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Test TargetObject type: System.Int32" name="Get-CustomError.Basic tests.Test TargetObject type: System.Int32" time="0.0121" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Git\OctopusDeploy\tests\Get-GitBranch.tests.ps1" executed="True" result="Failure" success="False" time="5.2654" asserts="0" description="C:\Git\OctopusDeploy\tests\Get-GitBranch.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="New-Release" executed="True" result="Failure" success="False" time="0" asserts="0" description="New-Release">
+            <results>
+              <test-suite type="TestFixture" name="New-Release.Basic tests" executed="True" result="Failure" success="False" time="0" asserts="0" description="New-Release.Basic tests">
+                <results>
+                  <test-case description="Project without source control" name="New-Release.Basic tests.Project without source control" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="Project with source control" name="New-Release.Basic tests.Project with source control" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Git\OctopusDeploy\tests\New-Release.tests.ps1" executed="True" result="Failure" success="False" time="5.2088" asserts="0" description="C:\Git\OctopusDeploy\tests\New-Release.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="New-Release" executed="True" result="Failure" success="False" time="0" asserts="0" description="New-Release">
+            <results>
+              <test-suite type="TestFixture" name="New-Release.Basic tests" executed="True" result="Failure" success="False" time="0" asserts="0" description="New-Release.Basic tests">
+                <results>
+                  <test-case description="New Release" name="New-Release.Basic tests.New Release" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="New Release version controlled project" name="New-Release.Basic tests.New Release version controlled project" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="New Release with specific version" name="New-Release.Basic tests.New Release with specific version" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="New Release version controlled project non default branch " name="New-Release.Basic tests.New Release version controlled project non default branch " time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="New Release in non default channel" name="New-Release.Basic tests.New Release in non default channel" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="New Release with package version full" name="New-Release.Basic tests.New Release with package version full" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="New Release with package version partial" name="New-Release.Basic tests.New Release with package version partial" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Git\OctopusDeploy\tests\Remove-Release.tests.ps1" executed="True" result="Failure" success="False" time="5.2492" asserts="0" description="C:\Git\OctopusDeploy\tests\Remove-Release.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Remove-Release" executed="True" result="Failure" success="False" time="0" asserts="0" description="Remove-Release">
+            <results>
+              <test-suite type="TestFixture" name="Remove-Release.Basic tests" executed="True" result="Failure" success="False" time="0" asserts="0" description="Remove-Release.Basic tests">
+                <results>
+                  <test-case description="Delete release" name="Remove-Release.Basic tests.Delete release" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="Delete specific release with project and version" name="Remove-Release.Basic tests.Delete specific release with project and version" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="Delete specific release by piping release" name="Remove-Release.Basic tests.Delete specific release by piping release" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

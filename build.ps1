@@ -1,93 +1,47 @@
-[CmdletBinding(DefaultParameterSetName = 'Task')]
-Param (
-    [Parameter(ParameterSetName = 'Task',
-        Position = 0)]
-    [String[]]$Task = 'default',
+[cmdletbinding(DefaultParameterSetName = 'Task')]
+param(
+    # Build task(s) to execute
+    [parameter(ParameterSetName = 'task', position = 0)]
+    [string[]]$Task = 'default',
+
+    # Bootstrap dependencies
     [switch]$Bootstrap,
+
     # List available build tasks
     [parameter(ParameterSetName = 'Help')]
     [switch]$Help,
+
     # Optional properties to pass to psake
-    [hashtable]$Properties
+    [hashtable]$Properties,
 
+    # Optional parameters to pass to psake
+    [hashtable]$Parameters
 )
-#$VerbosePreference = "Continue"
+
 $ErrorActionPreference = 'Stop'
-$psdependVersion = [version]'0.3.8'
 
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-
+# Bootstrap dependencies
 if ($Bootstrap.IsPresent) {
-    Write-Verbose "Bootstrapping"
-    Write-Host 'Adding Octopus Certificate'
-    . $PSScriptRoot\install_certificate.ps1
-    $certs = Get-CertificatesFromUrl 'octo.medavis.com'
-    Import-X509Certificate -X509Certificate $certs -WindowsOrDotNet
-    if (-not (Get-PackageProvider -Name "NuGet" -Force -ErrorAction SilentlyContinue)) {
-        Write-Output "Install PackageProvider NuGet"
-        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope CurrentUser
+    Get-PackageProvider -Name Nuget -ForceBootstrap | Out-Null
+    Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+    if ((Test-Path -Path ./requirements.psd1)) {
+        if (-not (Get-Module -Name PSDepend -ListAvailable)) {
+            Install-Module -Name PSDepend -Repository PSGallery -Scope CurrentUser -Force
+        }
+        Import-Module -Name PSDepend -Verbose:$false
+        Invoke-PSDepend -Path './requirements.psd1' -Install -Import -Force -WarningAction SilentlyContinue
     } else {
-        Write-Output "PackageProvider NuGet already installed."
+        Write-Warning 'No [requirements.psd1] found. Skipping build dependency installation.'
     }
-
-    if (!(Get-PackageSource -Location "https://www.nuget.org/api/v2" -ErrorAction SilentlyContinue).name -ne "nuget.org" ) {
-        $name = (Get-PackageSource -Location "https://www.nuget.org/api/v2" -ErrorAction SilentlyContinue).providername
-        Write-Host "Found a Package Provider that points to nuget.org but is called `"$name`""
-    }
-    #register nuget.org as package source
-    if (!(Get-PackageSource -Name "nuget.org" -ErrorAction SilentlyContinue)) {
-        Register-PackageSource -Name nuget.org -Location 'https://www.nuget.org/api/v2' -Trusted -ProviderName "NuGet"
-    }
-
-    foreach ($PSRepository in (Get-PSRepository -ErrorAction SilentlyContinue -WarningAction SilentlyContinue).Name) {
-        Write-Output "Unregistering PSRepository $PSRepository"
-        Unregister-PSRepository -Name $PSRepository
-    }
-    if (-not (Get-PSRepository -Name "PSGallery" -ErrorAction SilentlyContinue)) {
-        Write-Output "Registering PSGallery"
-        Register-PSRepository -Default -InstallationPolicy Trusted
-    } else {
-        Write-Output "PSRepository PSGallery already registered."
-    }
-    if (-not (Get-Module -Name PsDepend -ListAvailable | Where-Object Version -GE $psdependVersion)) {
-        Install-Module -Name PsDepend -MinimumVersion $psdependVersion -Scope CurrentUser
-    } elseif ((Get-Module -Name PSDepend -ListAvailable) -and !(Get-Module -Name PSDepend -ListAvailable | Where-Object Version -EQ $psdependVersion)) {
-        ​​
-        Remove-Module -Name PsDepend
-    }
-    Import-Module -Name PsDepend
-    New-Item -Path .\dependencies -ItemType Directory -Force
-    Invoke-PSDepend -Path .\requirements.psd1 -Force
-    Install-Module -Name PowerShellGet -Force
-    Remove-Module -Name powershellget -Force
 }
-"#############################################"
-"#############################################"
-if (! $islinux) {
-    #gitversion /showvariable NuGetVersionV2
-    gitversion
-}
-"#############################################"
-"#############################################"
-
-if (-not (Get-PSRepository -Name "PSGallery-group" -ErrorAction SilentlyContinue)) {
-    Write-Output "Registering PSGallery-group"
-    Register-PSRepository -Name "PSGallery-group" -SourceLocation "https://repo.medavis.local/repository/psgallery-group/" -PublishLocation "https://repo.medavis.local/repository/psgallery-private/" -PackageManagementProvider Nuget -InstallationPolicy Trusted
-} else {
-    Write-Output "PSRepository PSGallery-group is already registered."
-}
-
-Import-Module PowerShellBuild
-#Invoke-psake -buildFile '.\psakeBuild.ps1' -taskList $Task -ErrorAction Stop
-#exit ( [int]( -not $psake.build_success ) )
 
 # Execute psake task(s)
-$psakeFile = './psakeBuild.ps1'
+$psakeFile = './psakeFile.ps1'
 if ($PSCmdlet.ParameterSetName -eq 'Help') {
     Get-PSakeScriptTasks -buildFile $psakeFile |
-    Format-Table -Property Name, Description, Alias, DependsOn
+        Format-Table -Property Name, Description, Alias, DependsOn
 } else {
     Set-BuildEnvironment -Force
-    Invoke-psake -buildFile $psakeFile -taskList $Task -nologo -properties $Properties
+    Invoke-psake -buildFile $psakeFile -taskList $Task -nologo -properties $Properties -parameters $Parameters
     exit ([int](-not $psake.build_success))
 }
