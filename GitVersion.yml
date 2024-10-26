@@ -1,0 +1,21 @@
+mode: Mainline
+no-bump-message: '\+semver:\s?(none|skip)'
+branches:
+  main:
+    tag:
+    increment: Patch
+    regex: ^master$|^main$
+  feature:
+    tag: alpha
+    increment: Minor
+    regex: ^features?[/-]
+  pull-request:
+    tag: preview
+    increment: Inherit
+    source-branches: [ 'feature', 'hotfix' ]
+  hotfix:
+    tag: alpha
+    increment: Patch
+    regex: ^hotfix(es)?[/-]|^patch?[/-]
+
+

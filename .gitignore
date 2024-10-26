@@ -1,0 +1,15 @@
+# Don't check in the Output dir
+Output/
+Dependencies/
+dependencies/
+Secrets/
+test.ps1
+*.dll
+release/
+.vscode/
+docs/
+.github/
+testresult.xml
+octo.medavis.local.crt
+.env
+/devcontainer/devcontainer.env
