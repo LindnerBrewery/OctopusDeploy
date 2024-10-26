@@ -6,7 +6,7 @@ properties {
     $PSBPreference.General.ModuleVersion = dotnet-gitversion /showvariable MajorMinorPatch
 }
 
-task Default -depends updateversion, build, pester, Test
+task Default -depends updateversion, build 
 
 task Test -FromModule PowerShellBuild -minimumVersion '0.6.1' -depends UpdateVersion, build, pester
 task build -FromModule PowerShellBuild -minimumVersion '0.6.1' -depends UpdateVersion

@@ -1,15 +1,15 @@
-# OctoDeploy
+# OctopusDeploy
 
 Powershell wrapper around octoclient.dll to help  interacting with any octopus instance. Cloud or on-premise
 
 ## Overview
 
-This module will let you use the octoclient in a more 'powershelly' way. This module is "as is" and there can be breaking changes in future versions.
+This module will let you use the octoclient in a more 'PowerShelly' way. This module is "as is" and there can be breaking changes in future versions.
 
 ## Installation
 
 ```powershell
-Install-Module -Name OctoDeploy
+Install-Module -Name OctopusDeploy
 ```
 
 ## Getting started
