@@ -22,8 +22,8 @@ Properties {
 Task Default -depends Release -description 'define the Default task'
 Task Build -FromModule PowerShellBuild -Version '0.4.0'
 #Task GenerateMarkdown -FromModule PowerShellBuild -Version '0.4.0'
-Task Release -depends Build, UpdateVersion, Sign, Publish -description 'the release task with signing'
-#Task Release -depends Build, UpdateVersion ,GenerateGraph, Sign, Publish -description 'the release task with signing'
+Task BuildUpdateVersion -depends Build, UpdateVersion -description 'Build and UpdateVersion'
+Task Release -depends Build, UpdateVersion, Publish -description 'Release the module'
 
 Task UpdateVersion -depends Build {
     $file = "$env:BHBuildOutput\$env:BHProjectName.psd1"
