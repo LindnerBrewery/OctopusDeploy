@@ -24,7 +24,7 @@
         Version = '0.6.1'
         Parameters = @{
             Scope = 'currentuser'
-            ErrorAction       = 'silentlycontinue'
+            ErrorAction = 'silentlycontinue'
         }
     }
     'PSScriptAnalyzer' = @{
