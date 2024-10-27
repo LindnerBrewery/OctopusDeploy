@@ -38,7 +38,7 @@
         Write-host $octoClient
         Copy-item $octoClient\lib\net462\Octopus.Client.dll $DependencyFolder\OctopusDeploy\Lib\Desktop\Octopus.Client.dll -force -verbose;
         Copy-item $octoClient\lib\netstandard2.0\Octopus.Client.dll $DependencyFolder\OctopusDeploy\Lib\Core\Octopus.Client.dll -force -verbose'
-        # DependsOn      = 'Octopus.Client'
+        DependsOn      = 'Octopus.Client'
     }
     'gitversion' = @{
         DependencyType = 'Command'
