@@ -1,7 +1,10 @@
 @{
-    PSDependOptions       = @{
-        Target    = '$DependencyFolder\dependencies' # I want all my dependencies installed here
-        AddToPath = $True            # I want to prepend project to $ENV:Path and $ENV:PSModulePath
+    # PSDependOptions       = @{
+    #     Target    = '$DependencyFolder\dependencies' # I want all my dependencies installed here
+    #     AddToPath = $True            # I want to prepend project to $ENV:Path and $ENV:PSModulePath
+    # }
+    PSDependOptions = @{
+        Target = 'CurrentUser'
     }
     'Pester'              = @{
         Version    = 'latest'
