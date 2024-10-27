@@ -31,17 +31,17 @@ if ($Bootstrap.IsPresent) {
         Import-Module -Name PSDepend -Verbose:$false
         Invoke-PSDepend -Path './requirements.psd1' -Install -Import -Force -WarningAction SilentlyContinue
 
-        $octoClient = (Get-ChildItem $DependencyFolder\dependencies\Octopus.Client.* | Sort-Object -Property @{e = { [version]$_.name.replace("Octopus.Client.", "") } } -Descending | Select-Object -First 1).fullname;
+        $octoClient = (Get-ChildItem $env:DependencyFolder\dependencies\Octopus.Client.* | Sort-Object -Property @{e = { [version]$_.name.replace("Octopus.Client.", "") } } -Descending | Select-Object -First 1).fullname;
         Write-Host $octoClient
-        Copy-Item $octoClient\lib\net462\Octopus.Client.dll $DependencyFolder\OctopusDeploy\Lib\Desktop\Octopus.Client.dll -Force -Verbose;
-        Copy-Item $octoClient\lib\netstandard2.0\Octopus.Client.dll $DependencyFolder\OctopusDeploy\Lib\Core\Octopus.Client.dll -Force -Verbose
+        Copy-Item $octoClient\lib\net462\Octopus.Client.dll $env:DependencyFolder\OctopusDeploy\Lib\Desktop\Octopus.Client.dll -Force -Verbose;
+        Copy-Item $octoClient\lib\netstandard2.0\Octopus.Client.dll $env:DependencyFolder\OctopusDeploy\Lib\Core\Octopus.Client.dll -Force -Verbose
 
     }
 
 } else {
     Write-Warning 'No [requirements.psd1] found. Skipping build dependency installation.'
 }
-}
+
 
 # Execute psake task(s)
 $psakeFile = './psakeFile.ps1'

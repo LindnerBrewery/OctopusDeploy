@@ -48,6 +48,11 @@
         DependencyType = 'Command'
         Source         = 'if ($isWindows){choco upgrade NuGet.CommandLine -yf}'
     }
+    'EnvDependencyFolder' = @{
+        DependencyType = 'Command'
+        Source         = '$env:DependencyFolder = "$DependencyFolder"; Write-host "DependencyFolder is $env:DependencyFolder"'
+    }
+
 
 }
 
