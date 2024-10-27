@@ -7,7 +7,7 @@ branches:
     regex: ^master$|^main$
   feature:
     tag: alpha
-    increment: Minor
+    increment: Patch
     regex: ^features?[/-]
   pull-request:
     tag: preview
