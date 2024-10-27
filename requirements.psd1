@@ -4,7 +4,7 @@
         AddToPath = $True            # I want to prepend project to $ENV:Path and $ENV:PSModulePath
     }
     'Pester'              = @{
-        Version    = 'latest'
+        Version    = '5.6.0'
         Parameters = @{
             SkipPublisherCheck = $true
         }
