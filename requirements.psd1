@@ -32,14 +32,14 @@
             SkipDependencies = $true
         }
     }
-    'Octopus.Client.Copy' = @{
-        DependencyType = 'Command'
-        Source         = '$octoClient = (Get-Childitem $DependencyFolder\dependencies\Octopus.Client.* | Sort-Object -Property @{e={[version]$_.name.replace("Octopus.Client.","")}} -Descending | Select -first 1).fullname;
-        Write-host $octoClient
-        Copy-item $octoClient\lib\net462\Octopus.Client.dll $DependencyFolder\OctopusDeploy\Lib\Desktop\Octopus.Client.dll -force -verbose;
-        Copy-item $octoClient\lib\netstandard2.0\Octopus.Client.dll $DependencyFolder\OctopusDeploy\Lib\Core\Octopus.Client.dll -force -verbose'
-        DependsOn      = 'Octopus.Client'
-    }
+    # 'Octopus.Client.Copy' = @{
+    #     DependencyType = 'Command'
+    #     Source         = '$octoClient = (Get-Childitem $DependencyFolder\dependencies\Octopus.Client.* | Sort-Object -Property @{e={[version]$_.name.replace("Octopus.Client.","")}} -Descending | Select -first 1).fullname;
+    #     Write-host $octoClient
+    #     Copy-item $octoClient\lib\net462\Octopus.Client.dll $DependencyFolder\OctopusDeploy\Lib\Desktop\Octopus.Client.dll -force -verbose;
+    #     Copy-item $octoClient\lib\netstandard2.0\Octopus.Client.dll $DependencyFolder\OctopusDeploy\Lib\Core\Octopus.Client.dll -force -verbose'
+    #     DependsOn      = 'Octopus.Client'
+    # }
     'gitversion' = @{
         DependencyType = 'Command'
         Source         = 'if ($isWindows){choco install GitVersion.Portable --version 5.12.0 -yf}'
