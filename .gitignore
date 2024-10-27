@@ -8,7 +8,6 @@ test.ps1
 release/
 .vscode/
 docs/
-.github/
 testresult.xml
 octo.medavis.local.crt
 .env
