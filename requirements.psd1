@@ -7,6 +7,7 @@
         Version    = 'latest'
         Parameters = @{
             SkipPublisherCheck = $true
+            ErrorAction       = 'silentlycontinue'
         }
     }
 
@@ -40,18 +41,14 @@
     #     Copy-item $octoClient\lib\netstandard2.0\Octopus.Client.dll $DependencyFolder\OctopusDeploy\Lib\Core\Octopus.Client.dll -force -verbose'
     #     DependsOn      = 'Octopus.Client'
     # }
-    'gitversion' = @{
-        DependencyType = 'Command'
-        Source         = 'if ($isWindows){choco install GitVersion.Portable --version 5.12.0 -yf}'
-    }
-    'nuget' = @{
-        DependencyType = 'Command'
-        Source         = 'if ($isWindows){choco upgrade NuGet.CommandLine -yf}'
-    }
-    'EnvDependencyFolder' = @{
-        DependencyType = 'Command'
-        Source         = '$env:DependencyFolder = "$DependencyFolder"; Write-host "DependencyFolder is $env:DependencyFolder"'
-    }
+    # 'gitversion' = @{
+    #     DependencyType = 'Command'
+    #     Source         = 'if ($isWindows){choco install GitVersion.Portable --version 5.12.0 -yf}'
+    # }
+    # 'nuget' = @{
+    #     DependencyType = 'Command'
+    #     Source         = 'if ($isWindows){choco upgrade NuGet.CommandLine -yf}'
+    # }
 
 
 }
