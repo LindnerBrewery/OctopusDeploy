@@ -14,6 +14,8 @@ task Default -depends buildmodule
 # task build -FromModule PowerShellBuild -minimumVersion '0.6.1' #-depends UpdateVersion
 task init -FromModule PowerShellBuild -minimumVersion '0.6.1'
 task buildmodule -depends init, clean, stagefiles, UpdateVersion, GENERATEMARKDOWN, GENERATEMAML, BUILDHELP, Test
+task release -depends init, clean, stagefiles, UpdateVersion, GENERATEMARKDOWN, GENERATEMAML, BUILDHELP, publish
+
 
 Task UpdateVersion  {
     $file = "$env:BHBuildOutput\$env:BHProjectName.psd1"

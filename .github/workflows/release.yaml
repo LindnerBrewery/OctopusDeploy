@@ -23,4 +23,4 @@ jobs:
       shell: pwsh
       env:
         PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
-      run: Write-Host "Would publish" #$env:PSGALLERY_API_KEY ; ./build.ps1 -Task Publish -Bootstrap
+      run: $env:PSGALLERY_API_KEY ; ./build.ps1 -Task Release -Bootstrap

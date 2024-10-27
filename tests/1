@@ -1,0 +1,29 @@
+Pester v5.6.1
+
+Starting discovery in 1 files.
+Discovery found 1 tests in 9ms.
+Running tests.
+
+Running tests from 'C:\Git\OctopusDeploy\tests\mock.tests.ps1'
+Describing Mock Tests
+  [-] Should always fail
+ 3ms (2ms|1ms)
+   Expected $false, but got $true.
+   at $true | Should -Be $false, C:\Git\OctopusDeploy\tests\mock.tests.ps1:3
+   at Test-PSBuildPester, C:\Users\emrys\OneDrive\Documents\PowerShell\Modules\PowerShellBuild\0.6.1\Public\Test-PSBuildPester.ps1:96
+   at <ScriptBlock>, C:\Users\emrys\OneDrive\Documents\PowerShell\Modules\PowerShellBuild\0.6.1\psakeFile.ps1:109
+   at Invoke-Task, C:\Users\emrys\OneDrive\Documents\Powershell\Modules\psake\4.9.0\public\Invoke-Task.ps1:108
+   at Invoke-Task, C:\Users\emrys\OneDrive\Documents\Powershell\Modules\psake\4.9.0\public\Invoke-Task.ps1:84
+   at Invoke-Task, C:\Users\emrys\OneDrive\Documents\Powershell\Modules\psake\4.9.0\public\Invoke-Task.ps1:142
+   at <ScriptBlock>, C:\Users\emrys\OneDrive\Documents\Powershell\Modules\psake\4.9.0\public\Invoke-psake.ps1:303
+   at ExecuteInBuildFileScope, C:\Users\emrys\OneDrive\Documents\PowerShell\Modules\psake\4.9.0\private\ExecuteInBuildFileScope.ps1:57
+   at Invoke-psake, C:\Users\emrys\OneDrive\Documents\Powershell\Modules\psake\4.9.0\public\Invoke-psake.ps1:258
+   at <ScriptBlock>, C:\Git\OctopusDeploy\build.ps1:53
+   at <ScriptBlock>, <No file>:1
+Tests completed in 55ms
+Tests Passed: 0, 
+Failed: 1, 
+Skipped: 0, 
+Inconclusive: 0, 
+
+NotRun: 0
