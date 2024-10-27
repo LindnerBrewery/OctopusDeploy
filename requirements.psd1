@@ -1,10 +1,7 @@
 @{
-    # PSDependOptions       = @{
-    #     Target    = '$DependencyFolder\dependencies' # I want all my dependencies installed here
-    #     AddToPath = $True            # I want to prepend project to $ENV:Path and $ENV:PSModulePath
-    # }
-    PSDependOptions = @{
-        Target = 'CurrentUser'
+    PSDependOptions       = @{
+        Target    = '$DependencyFolder\dependencies' # I want all my dependencies installed here
+        AddToPath = $True            # I want to prepend project to $ENV:Path and $ENV:PSModulePath
     }
     'Pester'              = @{
         Version    = 'latest'
@@ -41,7 +38,7 @@
         Write-host $octoClient
         Copy-item $octoClient\lib\net462\Octopus.Client.dll $DependencyFolder\OctopusDeploy\Lib\Desktop\Octopus.Client.dll -force -verbose;
         Copy-item $octoClient\lib\netstandard2.0\Octopus.Client.dll $DependencyFolder\OctopusDeploy\Lib\Core\Octopus.Client.dll -force -verbose'
-        DependsOn      = 'Octopus.Client'
+        # DependsOn      = 'Octopus.Client'
     }
     'gitversion' = @{
         DependencyType = 'Command'
