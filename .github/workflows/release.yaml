@@ -1,5 +1,7 @@
-name: CI
-on: [push, pull_request]
+name: Release module
+on:
+  workflow_dispatch:
+
 jobs:
   test:
     name: Run Tests
@@ -7,8 +9,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu-latest, macOS-latest]
     steps:
+    - name: Fail if branch is not main
+      if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+      run: |
+        echo "This workflow should not be triggered with workflow_dispatch on a branch other than main"
+        exit 1
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v0
       with:
