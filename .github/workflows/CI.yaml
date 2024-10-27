@@ -21,7 +21,7 @@ jobs:
       run: ls $pwd; dotnet-gitversion
     - name: Test
       shell: pwsh
-      run: ./build.ps1 -Task Test -Bootstrap
+      run: ./build.ps1 -Task default -Bootstrap
   publish:
     name: Run build
     needs:
