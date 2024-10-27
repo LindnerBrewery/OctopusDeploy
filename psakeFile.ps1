@@ -45,7 +45,7 @@ Task UpdateVersion  {
     # Save the updated content
     $content | Set-Content -Path $file  -Encoding UTF8
     Write-Host "Successfully updated ModuleVersion to $NewVersion in $Path"
-    if ($prereleaseVersion) {
+    if ($prereleaseVersion -and $prereleaseVersion -notlike "*tag*") {
         $moduleversion = ("{0}-{1}" -f $moduleversion, $prereleaseVersion)
         update-ModuleManifest -Path $file  -ModuleVersion $newVersion -Prerelease $prereleaseVersion
     }
