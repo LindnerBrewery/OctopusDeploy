@@ -30,7 +30,7 @@ CompanyName = ''
 Copyright = '(c) 2024 Emrys MacInally. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Powershell wrapper around octoclient to help with standard problems'
+Description = 'Powershell wrapper around Octopus.Client.dll to help with standard problems'
 
 # Minimum version of the PowerShell engine required by this module
 # PowerShellVersion = ''
@@ -63,7 +63,7 @@ ScriptsToProcess = 'startup.ps1'
 # TypesToProcess = @()
 
 # Format files (.ps1xml) to be loaded when importing this module
-FormatsToProcess = './Formats/TaskresultClass.Format.ps1xml', 
+FormatsToProcess = './Formats/TaskresultClass.Format.ps1xml',
                './Formats/ProjectDeploymentObject.Format.ps1xml'
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
@@ -102,7 +102,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = 'medavis'
+        Tags = 'octopusdeploy', 'octopus', 'devops', 'deployment'
 
         # A URL to the license for this module.
         # LicenseUri = ''

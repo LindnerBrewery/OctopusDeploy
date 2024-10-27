@@ -12,3 +12,4 @@ testresult.xml
 octo.medavis.local.crt
 .env
 /devcontainer/devcontainer.env
+tests/out/
