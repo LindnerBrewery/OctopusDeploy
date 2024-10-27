@@ -52,7 +52,7 @@ Task UpdateVersion  {
     $moduledata = Import-PowerShellDataFile -Path $file
     $moduleversion = $moduledata.ModuleVersion
     $prereleaseVersion = $moduledata.PrivateData.psdata.prerelease
-    if ($prereleaseVersion) {
+    if ($prereleaseVersion -and $prereleaseVersion -notlike "*tag*") {
         $moduleversion = ("{0}-{1}" -f $moduleversion, $prereleaseVersion)
     }
     Write-Host ("Version is: {0}" -f $moduleversion)
