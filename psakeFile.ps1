@@ -5,6 +5,7 @@ properties {
     $PSBPreference.Test.OutputFile = 'out/testResults.xml'
     $PSBPreference.General.ModuleVersion = dotnet-gitversion /showvariable MajorMinorPatch
     $PSBPreference.Test.ScriptAnalysis.FailBuildOnSeverityLevel = 'Error'
+    $PSBPreference.Test.ImportModule = $true
 }
 
 task Default -depends buildmodule
