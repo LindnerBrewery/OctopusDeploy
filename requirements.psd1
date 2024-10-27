@@ -46,7 +46,7 @@
     }
     'nuget' = @{
         DependencyType = 'Command'
-        Source         = 'choco upgrade NuGet.CommandLine -yf'
+        Source         = 'if ($isWindows){choco upgrade NuGet.CommandLine -yf}'
     }
 
 }
