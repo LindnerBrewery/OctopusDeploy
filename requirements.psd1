@@ -22,10 +22,6 @@
     }
     'PowerShellBuild'     = @{
         Version = '0.6.1'
-        Parameters = @{
-            Scope = 'currentuser'
-            ErrorAction = 'silentlycontinue'
-        }
     }
     'PSScriptAnalyzer' = @{
         Version = '1.19.1'
