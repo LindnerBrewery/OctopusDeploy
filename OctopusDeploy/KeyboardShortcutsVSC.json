@@ -1,0 +1,48 @@
+// Place your key bindings in this file to override the defaults
+[
+{ "key": "ctrl+k",
+    "command": "workbench.action.terminal.focus"
+},
+{ "key": "ctrl+k",
+    "command": "workbench.action.focusActiveEditorGroup",
+    "when": "terminalFocus"
+},
+{
+    "key": "ctrl+shift+t",
+    "command": "shellLauncher.launch"
+},
+{
+    "key": "ctrl+shift+r",
+    "command": "PowerShell.RestartSession"
+},
+{
+    "key": "ctrl+alt+numpad8",
+    "command": "editor.action.insertCursorAbove",
+    "when": "editorTextFocus"
+},
+{
+    "key": "ctrl+alt+up",
+    "command": "editor.action.insertCursorAbove",
+    "when": "editorTextFocus"
+},
+{
+    "key": "ctrl+alt+numpad2",
+    "command": "editor.action.insertCursorBelow",
+    "when": "editorTextFocus"
+},
+{
+    "key": "ctrl+alt+down",
+    "command": "-editor.action.insertCursorBelow",
+    "when": "editorTextFocus"
+},
+{
+    "key": "ctrl+space",
+    "command": "-workbench.action.terminal.sendSequence",
+    "when": "terminalFocus && terminalShellIntegrationEnabled && !accessibilityModeEnabled && terminalShellType == 'pwsh'"
+},
+{
+    "key": "ctrl+v",
+    "command": "-workbench.action.terminal.sendSequence",
+    "when": "terminalFocus && !accessibilityModeEnabled && terminalShellType == 'pwsh'"
+}
+]

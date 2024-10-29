@@ -1,0 +1,5 @@
+# List of ToDo
+
+TODO: new function Get-Worker (analog to get-machine)!
+TODO: new function Get-MachineConnectionStatus -Machine MachineName ($repo._repository.Machines.GetConnectionStatus((Get-Machine | select -first 1)))
+TODO: new function Get-WorkerConnectionStatus -Worker WorkerName  ($repo._repository.Workers.GetConnectionStatus()

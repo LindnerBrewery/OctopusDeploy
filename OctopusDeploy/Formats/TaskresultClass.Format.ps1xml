@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>myTaskResult</Name>
+      <ViewSelectedBy>
+        <TypeName>TaskResult</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Width>5</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Width>50</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Width>13</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Message</Label>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>Step</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+                            <TableColumnItem>
+                <PropertyName>Status</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>_hiddenMessage</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>
