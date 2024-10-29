@@ -9,6 +9,6 @@ release/
 .vscode/
 docs/
 testresult.xml
-octo.medavis.local.crt
+*.crt
 tests/out/
 .devcontainer/devcontainer.env

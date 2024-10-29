@@ -21,17 +21,17 @@ Update-Module OctopusDeploy
 You can connect to an on premise or cloud instance of octopus
 ```Powershell
 $ApiKey = ($APIKEY | ConvertTo-SecureString -AsPlainText -Force)
-Connect-Octopus -OctopusServerURL https://octo.medavis.com -ApiKey $ApiKey
+Connect-Octopus -OctopusServerURL https://octopus.example.com -ApiKey $ApiKey
 ```
 
 You can save your connection configuration
 ```Powershell
-Set-ConnectionConfiguration -OctopusServerURL https://octo.medavis.com -ApiKey $ApiKey
+Set-ConnectionConfiguration -OctopusServerURL https://octopus.example.com -ApiKey $ApiKey
 ```
 _or_
 ___
 ```Powershell
-Set-ConnectionConfiguration -OctopusServerURL https://octo.medavis.com -ApiKey ($APIKEY | ConvertTo-SecureString -AsPlainText -Force)
+Set-ConnectionConfiguration -OctopusServerURL https://octopus.example.com -ApiKey ($APIKEY | ConvertTo-SecureString -AsPlainText -Force)
 ```
 ---
 ##### Check saved configuration
@@ -64,24 +64,24 @@ Get-Machine
 ---
 ##### Getting machine from tenant with argument completion and transformation
 ```powershell
-Get-Machine -Tenant XXROM001 -Environment Development
+Get-Machine -Tenant MyTenant -Environment Development
 ```
 ---
 ##### Piping to function and using help
 ```powershell
 Get-Help Get-machine -Full | Select-Object -ExpandProperty parameters
-'xxrom001' | Get-Machine | Select-Object name, environmentids
+'TenantName' | Get-Machine | Select-Object name, environmentids
 ```
 ---
 ##### More complex scenarios
 Machine object only contain IDs to other objects
 ```Powershell
-'xxrom001' | Get-Machine | Select-Object name, environmentids
+'TenantName' | Get-Machine | Select-Object name, environmentids
 ```
 ---
 Use calculated properties to get environment name
 ```powershell
-'xxrom001' | Get-Machine | Select-Object name, environmentids, @{n = 'EnvironmentName'; e = { (Get-Environment -ID $_.environmentids).name.tostring() } }
+'TenantName' | Get-Machine | Select-Object name, environmentids, @{n = 'EnvironmentName'; e = { (Get-Environment -ID $_.environmentids).name.tostring() } }
 ```
 ---
 ##### Get a list of machine roles and use them to query machines
@@ -90,8 +90,8 @@ Get-MachineRole
 ```
 
 ```powershell
-Get-Machine -Role RISDatabaseServer
-Get-Machine -Role RISDatabaseServer | Select-Object name, role, healthstatus
+Get-Machine -Role DatabaseServer
+Get-Machine -Role DatabaseServer | Select-Object name, role, healthstatus
 ```
 ---
 ## Getting tenant information
@@ -125,7 +125,7 @@ Get-TenantMachineCount
 ---
 #### Adding filters
 ```powershell
-Get-TenantMachineCount -Environment Production -MachineRole RISDatabaseServer
+Get-TenantMachineCount -Environment Production -MachineRole DatabaseServer
 ```
 ---
 #### Like most functions, pipeline is supported
@@ -134,11 +134,11 @@ Get-Help Get-TenantMachineCount | Select-Object -ExpandProperty parameters
 ```
 #### Getting non "X" tenants
 ```powershell
-Get-Tenant | Where-Object name -notlike "X*" | Get-TenantMachineCount -Environment Production -MachineRole RISDatabaseServer
+Get-Tenant | Where-Object name -notlike "X*" | Get-TenantMachineCount -Environment Production -MachineRole DatabaseServer
 ```
 #### Counting tenant machines depending on tags
 ```powershell
-Get-Tenant -Tag Region/AT | Get-TenantMachineCount -Environment Test -MachineRole RisdatabseServer
+Get-Tenant -Tag Region/AT | Get-TenantMachineCount -Environment Test -MachineRole DatabaseServer
 ```
 
 ### All functions have help and examples
@@ -148,7 +148,7 @@ Get-Help Get-Machine
 ```powershell
 Get-Help Get-Machine -Examples
 ```
-```powerhsell
+```powershell
 Get-Help Get-Machine -Full
 ```
 
@@ -197,7 +197,7 @@ Get-ProjectVariable -Project "install solution"
 
 #### Project template variables
 ```powershell
-Get-ProjectTenantVariable -Project "install RS" -Tenant XXROM001 -Environment Production
+Get-ProjectTenantVariable -Project "install solution" -Tenant TenantName -Environment Production
 ```
 
 #### Common variables
@@ -218,7 +218,7 @@ Variableset paramerter can autocomplete
 #### Common tenant variables
 Just like common variables, common tenant variables also expect a variable set name
 ```powershell
-Get-CommonTenantVariable -VariableSet 'Customer Variables' -Tenant ATATT01R
+Get-CommonTenantVariable -VariableSet 'Customer Variables' -Tenant TenantName
 ```
 
 ### Writing variables
@@ -226,46 +226,46 @@ current only common tenant variables are supported
 #### Writing a single common tenant variable
 
 ```powershell
-Get-CommonTenantVariable -VariableSet 'Customer Variables' -Tenant XXROM001
+Get-CommonTenantVariable -VariableSet 'Customer Variables' -Tenant TenantName
 ```
 
 ```powershell
-Set-CommonTenantVariable -Tenant XXROM001 -VariableSet 'Customer Variables' -Name Unlocode -Value "bla"
+Set-CommonTenantVariable -Tenant TenantName -VariableSet 'Customer Variables' -Name Unlocode -Value "bla"
 ```
 
 #### Removing a single common tenant variable
 ```powershell
-Set-CommonTenantVariable -Tenant XXROM001 -VariableSet 'Customer Variables' -Name Unlocode -Value ""
+Set-CommonTenantVariable -Tenant TenantName -VariableSet 'Customer Variables' -Name Unlocode -Value ""
 ```
 
 #### Writing a multiple variables using a hashtable
 ```powershell
-$params = @{Unlocode                     = "bla1"
-    'Server.Ris.Database.IP[Production]' = "blup1"
-    'Password.User.medavis'              = "XXXXPA1XXXX"
+$params = @{CustomerCode             = "bla1"
+    'Server.Database.IP[Production]' = "blup1"
+    'Password.User'                  = "XXXXPA1XXXX"
 }
-Set-CommonTenantVariable -Tenant XXROM001 -VariableSet 'Customer Variables' -VariableHash $params
+Set-CommonTenantVariable -Tenant TenantName -VariableSet 'Customer Variables' -VariableHash $params
 ```
 
 ## Adding/removing roles
 
 #### Adding role to machine
 ```powershell
-Get-Machine -name XXROM001-SESUP001-VM-DE | Add-RoleToMachine -Role riscomserver
+Get-Machine -name MachineName | Add-RoleToMachine -Role DatabaseServer
 ```
 ```powershell
-Add-RoleToMachine -Role default -Machine XXROM001-SESUP001-VM-DE
+Add-RoleToMachine -Role default -Machine MachineName
 ```
 #### Remove roles from machine
 ```powershell
-Get-Machine -name XXROM001-SESUP001-VM-DE | Remove-RoleFromMachine -Role riscomserver, default
+Get-Machine -name MachineName | Remove-RoleFromMachine -Role DatabaseServer, default
 ```
 ## Adding/removing tags to tenants
-```powerhsell
-Add-TagToTenant -Tenant XXROM001 -Tag Region/CH
+```powershell
+Add-TagToTenant -Tenant TenantName -Tag Region/CH
 ```
 ```powershell
-Get-Tenant -name XXROM001 | Remove-TagFromTenant -Tag Region/CH
+Get-Tenant -name TenantName | Remove-TagFromTenant -Tag Region/CH
 ```
 
 ## Adding/removing projects to tenant
@@ -275,9 +275,9 @@ You can add multiple projects to multiple tenants in multiple environments
 Add-ProjectToTenant -Project 'Install Solution' -Environment Development, Test, Production  -Tenant XXROMDOC
 ```
 ```powershell
-Add-ProjectToTenant -Project 'Install Solution' -Environment Development,Test -Tenant XXROMDOC -Verbose
+Add-ProjectToTenant -Project 'Install Solution' -Environment Development,Test -Tenant TenantName -Verbose
 # or
-Remove-ProjectFromTenant -Project 'Install Solution' -Tenant XXROMDOC -Verbose
+Remove-ProjectFromTenant -Project 'Install Solution' -Tenant TenantName -Verbose
 ```
 
 ## Deployments
@@ -288,7 +288,7 @@ Get-Deployment -Release (Get-Release -Project 'Configure RIS Server' -Latest -Ch
 #### Invoke a deployment
 ```Powershell
 $release = Get-release -Project 'Test Project' -Latest
-$tenant = Get-Tenant -name XXROM001
+$tenant = Get-Tenant -name TenantName
 Invoke-Deployment -Release $release -Environment Development -Tenant $tenant -QueueTime (get-date).AddMinutes(3)
 ```
 ## Runbooks
@@ -315,7 +315,7 @@ Get-Runbook -Project 'Test Project' -name artifact | Get-RunbookSnapshot -Publis
 ```
 #### invoke a runbook
 ```Powershell
-Invoke-RunbookRun -RunbookSnapshot "RunbookSnapshots-1541" -Tenant XXROM001  -Environment Development
+Invoke-RunbookRun -RunbookSnapshot "RunbookSnapshots-1541" -Tenant TenantName  -Environment Development
 ```
 ## Artifacts
 #### Getting artifacts and contents

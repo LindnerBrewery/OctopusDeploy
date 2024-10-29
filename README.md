@@ -35,14 +35,14 @@ Using Connect-Octopus is not necessary. Module will connect automatically to the
 ### Getting a list of machines
 
 ```powershell
-Get-Machine -Tenant XXROM001 -Environment QA | Select name, roles
+Get-Machine -Tenant Tenantname -Environment QA | Select name, roles
 ```
 ```
-Name                     Roles
-----                     -----
-DEKAE99Y-SEUAS01-VM-DE   {default, fax.service, RISDatabaseServer, UpdateAgent.service}
-DEKAE99Z-OCTONEXT05-VM-D {default}
-DEKAE99Z-OCTONEXT06-VM-D {default}
+Name        Roles
+----        -----
+Machine1    {default, fax.service, RISDatabaseServer, UpdateAgent.service}
+Machine2    {default}
+Machine3    {default}
 
 ```
 ### Get a list of machines in a certain environment and with a given role
@@ -58,13 +58,13 @@ $allTenants | Get-TenantMachine -Environment Production -MachineRole RISDatabase
 ```
 Tenant                              Machines                             Count
 ------                              --------                             -----
-ATATT01R                            Octopus.Client.Model.MachineResource     1
-DELIG01R                            Octopus.Client.Model.MachineResource     1
-DELGN01R                            Octopus.Client.Model.MachineResource     1
-DELEJ02R                            Octopus.Client.Model.MachineResource     1
-DELEJ01R                            Octopus.Client.Model.MachineResource     1
-DELEB01R                            Octopus.Client.Model.MachineResource     1
-DELDH01R                            Octopus.Client.Model.MachineResource     1
+TenantName1                         Octopus.Client.Model.MachineResource     1
+TenantName2                         Octopus.Client.Model.MachineResource     1
+TenantName3                         Octopus.Client.Model.MachineResource     1
+TenantName4                         Octopus.Client.Model.MachineResource     1
+TenantName5                         Octopus.Client.Model.MachineResource     1
+TenantName6                         Octopus.Client.Model.MachineResource     1
+TenantName7                         Octopus.Client.Model.MachineResource     1
 ```
 
 ### Getting a list of tenants with a certain tag
@@ -80,5 +80,3 @@ Get-TagSet -CanonicalTagName -Name Rolloutgroups
 ```powershell
 Get-Tenant -TenantTag Rolloutgroups/DB-1
 ```
-
-
