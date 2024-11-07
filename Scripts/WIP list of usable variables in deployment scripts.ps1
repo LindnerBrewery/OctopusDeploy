@@ -1,7 +1,7 @@
 ﻿# playing around with the idea of using the Octopus.Client or rest api to get a list of variables from a project
 
 [string]$path = '/api/Spaces-1/variables/names'
-
+$repo = Get-OctopusRepositoryObject
 # Make Generic List method
 $genericMethod = $repo._repository.Client.GetType().GetMethod("List").MakeGenericMethod([System.Array])
 

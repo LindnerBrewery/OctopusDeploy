@@ -76,7 +76,6 @@
             $deligate = 'param ($r) ($r.ProjectId -eq $project.id)'
 
 
-            # TODO: filter channel here if set as param
             # Add Channel filter to delegate
             if ($Channel) {
                 $channelObj = Get-Channel -Name $channel -Project $Project -ErrorAction stop
