@@ -21,7 +21,7 @@ try{
     Connect-Octopus
 } catch {
     Write-Warning $_.Exception.Message
-    Write-Warning "Unable to connect to Octopus Deploy server. Please use the Connect-Octopus cmdlet to connect to the server"
+    #Write-Warning "Unable to connect to Octopus Deploy server. Please use the Connect-Octopus cmdlet to connect to the server"
 }
 
 
