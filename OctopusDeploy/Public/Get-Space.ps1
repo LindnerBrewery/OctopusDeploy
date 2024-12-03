@@ -13,7 +13,14 @@
     Param (
     )
 
-    begin {}
+    begin {
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+    }
 
     process {
         $repo._repository.Spaces.GetAll()

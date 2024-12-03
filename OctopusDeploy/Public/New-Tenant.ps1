@@ -53,17 +53,11 @@ function New-Tenant {
 
     begin {
 
-        if (!(Test-OctopusConnection)) {
-            $err = [System.Management.Automation.ErrorRecord]::new(
-                [Octopus.Client.Exceptions.OctopusException]::new('Cannot connect to octopus server'),
-                'PSOctopusdeploy.ConnectionIssue',
-                'ConnectionError',
-                $null
-            )
-            $errorDetails = [System.Management.Automation.ErrorDetails]::new('Cannot connect to octopus server')
-            $errorDetails.RecommendedAction = 'Check your octopus credentials or network connection'
-            $err.ErrorDetails = $errorDetails
-            $PSCmdlet.ThrowTerminatingError($err)
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
         }
     }
 

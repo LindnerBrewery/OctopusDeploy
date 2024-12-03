@@ -1,5 +1,5 @@
 ﻿function Invoke-TaskScript {
-<#
+    <#
 .SYNOPSIS
     A short one-line action-based description, e.g. 'Tests if a function is valid'
 .DESCRIPTION
@@ -26,19 +26,28 @@
         $MaxTargetsPerTask
     )
     # TODO: Replace machineID with Machine Object and
-    Test-OctopusConnection | out-null
-    # split machineArray into chunks of $MaxTargetsPerTask https://stackoverflow.com/a/26850233
-    if ($machineId.count -gt $MaxTargetsPerTask -and $MaxTargetsPerTask) {
-        $counter = [pscustomobject] @{ Value = 0 }
-        $groups = $machineId | Group-Object -Property { [math]::Floor($counter.Value++ / $MaxTargetsPerTask) }
-        foreach ($item in $groups) {
-            Invoke-TaskScript -machineId $item.group -ScriptBlock $ScriptBlock -Description $Description
+    begin { 
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+    }
+    process {
+        # split machineArray into chunks of $MaxTargetsPerTask https://stackoverflow.com/a/26850233
+        if ($machineId.count -gt $MaxTargetsPerTask -and $MaxTargetsPerTask) {
+            $counter = [pscustomobject] @{ Value = 0 }
+            $groups = $machineId | Group-Object -Property { [math]::Floor($counter.Value++ / $MaxTargetsPerTask) }
+            foreach ($item in $groups) {
+                Invoke-TaskScript -MachineId $item.group -ScriptBlock $ScriptBlock -Description $Description
+            }
+
         }
 
+        $repo._repository.Tasks.ExecuteAdHocScript($ScriptBlock, $machineId, $environmentId, $roles , $Description)
+        #Invoke-TaskScript -machineId 'Machines-419' -ScriptBlock '$env:computername'
     }
-
-    $repo._repository.Tasks.ExecuteAdHocScript($ScriptBlock, $machineId, $environmentId, $roles , $Description)
-    #Invoke-TaskScript -machineId 'Machines-419' -ScriptBlock '$env:computername'
 }
 
 

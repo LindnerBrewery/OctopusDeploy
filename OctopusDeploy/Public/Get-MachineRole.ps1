@@ -14,10 +14,16 @@
     [OutputType([String[]])]
     Param ()
 
-    begin {}
+    begin {
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+    }
 
     process {
-        Test-OctopusConnection | Out-Null
         $repo._repository.MachineRoles.GetAllRoleNames()
     }
 

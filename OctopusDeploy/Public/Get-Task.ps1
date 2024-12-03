@@ -86,7 +86,14 @@
         [int]
         $ResultLimit
     )
-    begin { Test-OctopusConnection | Out-Null }
+    begin { 
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+     }
     process {
         if ($PSCmdlet.ParameterSetName -eq 'ByID') {
             $repo._repository.Tasks.Get($TaskID)

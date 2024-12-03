@@ -32,7 +32,12 @@
 
     )
     begin {
-        Test-OctopusConnection | Out-Null
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
     }
     Process {
         foreach ($_ArtifactID in $ArtifactID) {

@@ -36,9 +36,7 @@
 
     )
 
-    begin {
-
-    }
+    begin {}
 
     process {
         #connecting with saved configuration

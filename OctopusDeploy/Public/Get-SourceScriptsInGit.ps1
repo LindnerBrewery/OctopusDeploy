@@ -60,7 +60,12 @@
 
     )
     begin {
-        Test-OctopusConnection | Out-Null
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
     }
     process {
         # pass $runbook to $runb to ensure that runbook transformation isn't called when $runbook is assigned.

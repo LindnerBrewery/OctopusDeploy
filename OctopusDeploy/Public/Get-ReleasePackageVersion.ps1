@@ -28,7 +28,14 @@
         $AsHashtable
 
     )
-    begin { Test-OctopusConnection | Out-Null }
+    begin { 
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+    }
     process {
         Write-Verbose "Getting packages for $($release.Id) : $($release.version)"
         Write-Verbose "Link: $($repo.OctopusServerURL)$($release.Links.web)"
@@ -47,7 +54,8 @@
                         action    = $action.Name
                         PackageId = $packageID
                     })
-            } elseif ($packageID = ($action.Properties.Values.value -like "{`"PackageId`":*,`"FeedId`"*" | ConvertFrom-Json).PackageId) {
+            }
+            elseif ($packageID = ($action.Properties.Values.value -like "{`"PackageId`":*,`"FeedId`"*" | ConvertFrom-Json).PackageId) {
                 $packageReference.Add([PSCustomObject]@{
                         action    = $action.Name
                         PackageId = $packageID
@@ -60,7 +68,8 @@
         foreach ($packageRef in $packageReference) {
             if (($selectedPackages  | Where-Object Actionname -EQ $packageRef.action).count -gt 1) {
                 ($selectedPackages  | Where-Object { $_.Actionname -EQ $packageRef.action -and $_.PackageReferenceName -eq '' }).PackageReferenceName = $packageRef.PackageId
-            } else {
+            }
+            else {
             ($selectedPackages  | Where-Object Actionname -EQ $packageRef.action).PackageReferenceName = $packageRef.PackageId
             }
         }

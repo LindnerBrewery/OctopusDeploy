@@ -17,6 +17,14 @@ function _Set-Machine {
 
 
     )
+    begin{
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+    }
     process {
         Test-OctopusConnection | out-null
         #$repo._repository.Machines.getall()

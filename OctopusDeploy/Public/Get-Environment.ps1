@@ -1,5 +1,5 @@
 ﻿function Get-Environment {
-<#
+    <#
 .SYNOPSIS
     Returns environment object
 .DESCRIPTION
@@ -35,24 +35,35 @@
         $ID
 
     )
-    Test-OctopusConnection | out-null
-    $result = [System.Collections.ArrayList]::new()
-    if ($PSCmdlet.ParameterSetName -eq 'Name' -and ([String]::IsNullOrEmpty($Name))) {
-        $result = $repo._repository.Environments.getall()
-    }elseif ($PSCmdlet.ParameterSetName -eq 'Name') {
-        $result = $repo._repository.Environments.findbyname("$name")
-
-    }
-    if ($PSCmdlet.ParameterSetName -eq 'ID') {
+    begin {
         try {
-            $result = $repo._repository.Environments.get("$id")
-        } catch {}
-
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
     }
+    process {
+        $result = [System.Collections.ArrayList]::new()
+        if ($PSCmdlet.ParameterSetName -eq 'Name' -and ([String]::IsNullOrEmpty($Name))) {
+            $result = $repo._repository.Environments.getall()
+        }
+        elseif ($PSCmdlet.ParameterSetName -eq 'Name') {
+            $result = $repo._repository.Environments.findbyname("$name")
 
-    if (!($result)) {
-        $message = "There is no environment with the {0} `"{1}{2}`"" -f $PSCmdlet.ParameterSetName, $name, $ID
-        Throw $message
+        }
+        if ($PSCmdlet.ParameterSetName -eq 'ID') {
+            try {
+                $result = $repo._repository.Environments.get("$id")
+            }
+            catch {}
+
+        }
+
+        if (!($result)) {
+            $message = "There is no environment with the {0} `"{1}{2}`"" -f $PSCmdlet.ParameterSetName, $name, $ID
+            Throw $message
+        }
+        $result
     }
-    $result
 }

@@ -63,7 +63,14 @@
 
     )
 
-    begin {}
+    begin {
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+    }
 
     process {
         $project = Get-Project -ID $release.ProjectId

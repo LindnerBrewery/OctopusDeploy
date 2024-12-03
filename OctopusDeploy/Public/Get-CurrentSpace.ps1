@@ -1,5 +1,5 @@
 ﻿function Get-CurrentSpace {
-<#
+    <#
 .SYNOPSIS
     Returns Name and ID of the current space
 .DESCRIPTION
@@ -12,8 +12,18 @@
     param (
 
     )
-    Test-OctopusConnection | out-null
-    $spaceID = split-path ($repo._repository.LoadSpaceRootDocument().links.self) -Leaf
-    $repo._repository.Spaces.Get($spaceID) | Select-object Name, ID
+    begin {
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+    }
+    process {
 
+        $spaceID = Split-Path ($repo._repository.LoadSpaceRootDocument().links.self) -Leaf
+        $repo._repository.Spaces.Get($spaceID) | Select-Object Name, ID
+        
+    }
 }

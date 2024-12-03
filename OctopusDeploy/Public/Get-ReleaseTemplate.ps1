@@ -34,7 +34,14 @@
         $GitBranch
     )
 
-    begin {}
+    begin {
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+    }
 
     process {
         # get a git reference if source controlled or git branch was passed in as a parameter

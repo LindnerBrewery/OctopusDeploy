@@ -37,28 +37,39 @@
         $CanonicalTagName
 
     )
-    Test-OctopusConnection | Out-Null
-    $result = [System.Collections.ArrayList]::new()
-    if ($PSCmdlet.ParameterSetName -eq 'Name' -and ([String]::IsNullOrEmpty($Name))) {
-        $result = $repo._repository.TagSets.getall()
-    } elseif ($PSCmdlet.ParameterSetName -eq 'Name') {
-        $result = $repo._repository.TagSets.findbyname("$name")
-
-    }
-    if ($PSCmdlet.ParameterSetName -eq 'ID') {
+    begin {
         try {
-            $result = $repo._repository.TagSets.get("$id")
-        } catch {}
-
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
     }
+    process {
+        $result = [System.Collections.ArrayList]::new()
+        if ($PSCmdlet.ParameterSetName -eq 'Name' -and ([String]::IsNullOrEmpty($Name))) {
+            $result = $repo._repository.TagSets.getall()
+        }
+        elseif ($PSCmdlet.ParameterSetName -eq 'Name') {
+            $result = $repo._repository.TagSets.findbyname("$name")
 
-    if (!($result)) {
-        $message = "There is no TagSet with the {0} `"{1}{2}`"" -f $PSCmdlet.ParameterSetName, $name, $ID
-        Throw $message
-    }
+        }
+        if ($PSCmdlet.ParameterSetName -eq 'ID') {
+            try {
+                $result = $repo._repository.TagSets.get("$id")
+            }
+            catch {}
 
-    if ($CanonicalTagName.IsPresent) {
-        return  $result.Tags.CanonicalTagName
+        }
+
+        if (!($result)) {
+            $message = "There is no TagSet with the {0} `"{1}{2}`"" -f $PSCmdlet.ParameterSetName, $name, $ID
+            Throw $message
+        }
+
+        if ($CanonicalTagName.IsPresent) {
+            return  $result.Tags.CanonicalTagName
+        }
+        return $result
     }
-    return $result
 }

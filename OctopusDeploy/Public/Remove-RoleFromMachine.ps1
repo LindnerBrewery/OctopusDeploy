@@ -43,7 +43,14 @@
         $Role
     )
 
-    begin {}
+    begin {
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+    }
 
     process {
 

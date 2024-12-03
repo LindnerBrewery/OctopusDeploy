@@ -28,7 +28,12 @@
     )
     begin {
         # testing connection to octopus
-        Test-OctopusConnection | Out-Null
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
     }
     process {
         # variables types [System.Enum]::GetNames([Octopus.Client.Model.VariableSetContentType])

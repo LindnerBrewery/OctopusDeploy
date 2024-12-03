@@ -1,5 +1,5 @@
 ﻿function Get-MachinePolicy {
-<#
+    <#
 .SYNOPSIS
     Returns list of machine policies
 .DESCRIPTION
@@ -27,18 +27,26 @@
         $ID
 
     )
-    Test-OctopusConnection | Out-Null
-    $result = [System.Collections.ArrayList]::new()
-    if ($PSCmdlet.ParameterSetName -eq 'default') {
-        $result = $repo._repository.MachinePolicies.GetAll()
+    begin {
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
     }
-    if ($PSCmdlet.ParameterSetName -eq 'byName') {
-        $result = $repo._repository.MachinePolicies.findbyname("$name")
-    }
-    if ($PSCmdlet.ParameterSetName -eq 'byID') {
-        $result = $repo._repository.MachinePolicies.get("$id")
-    }
+    process {
+        $result = [System.Collections.ArrayList]::new()
+        if ($PSCmdlet.ParameterSetName -eq 'default') {
+            $result = $repo._repository.MachinePolicies.GetAll()
+        }
+        if ($PSCmdlet.ParameterSetName -eq 'byName') {
+            $result = $repo._repository.MachinePolicies.findbyname("$name")
+        }
+        if ($PSCmdlet.ParameterSetName -eq 'byID') {
+            $result = $repo._repository.MachinePolicies.get("$id")
+        }
 
-    $result
-
+        $result
+    }
 }

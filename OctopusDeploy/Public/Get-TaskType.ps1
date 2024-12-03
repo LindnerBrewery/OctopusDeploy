@@ -16,7 +16,14 @@
                    ConfirmImpact='low')]
     [OutputType([Octopus.Client.Model.TaskTypeResource])]
     Param ()
-
+    begin{
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+    }
     process {
         $repo._repository.Tasks.GetTaskTypes()
     }

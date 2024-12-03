@@ -37,7 +37,12 @@ Returns a list of all Projects with Environments connected to the tenants named 
     )
     begin {
         # testing connection to octopus
-        Test-OctopusConnection | Out-Null
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
         $allEnvs = Get-Environment
         $allproj = Get-Project
 

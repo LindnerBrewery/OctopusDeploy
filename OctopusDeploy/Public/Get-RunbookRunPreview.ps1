@@ -49,7 +49,14 @@
         $Environment
     )
 
-    begin {}
+    begin {
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+    }
 
     process {
         # TODO: implement for non tenanted runbook runs

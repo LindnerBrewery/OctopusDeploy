@@ -31,7 +31,14 @@
         #[Switch]        $PerTarget # has to be implemented by retrieving all targets in preview an then creating single runs for each target
     )
 
-    begin {}
+    begin {
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+    }
 
     process {
         $project = Get-Project -ID $release.ProjectId

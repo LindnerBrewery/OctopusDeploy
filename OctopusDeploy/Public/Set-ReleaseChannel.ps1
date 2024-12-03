@@ -41,7 +41,12 @@ function Set-ReleaseChannel {
         $Channel
     )
     begin {
-        Test-OctopusConnection | Out-Null
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
     }
 
     process {

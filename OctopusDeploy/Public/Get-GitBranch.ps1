@@ -23,22 +23,31 @@
         [Octopus.Client.Model.ProjectResource]
         $Project
     )
-    Test-OctopusConnection | Out-Null
-    if (! $project.IsVersionControlled) {
-        Write-verbose "$($project.name) is not version controlled"
-        return
+    begin {
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
     }
-    $branches = [System.Collections.ArrayList]::new()
-    $branches = ($repo._repository.Projects.GetGitBranches($Project)).items
+    process {
+        if (! $project.IsVersionControlled) {
+            Write-Verbose "$($project.name) is not version controlled"
+            return
+        }
+        $branches = [System.Collections.ArrayList]::new()
+        $branches = ($repo._repository.Projects.GetGitBranches($Project)).items
 
-    $result = [System.Collections.Generic.List[PSCustomObject]]::new()
-    foreach ($branch in $branches) {
-        $result.add([PSCustomObject]@{
-            Name = $branch.name
-            CanonicalName = $branch.CanonicalName
-            IsDefault = if($branch.name -eq $project.PersistenceSettings.defaultBranch){$True}else{$false}
-        })
+        $result = [System.Collections.Generic.List[PSCustomObject]]::new()
+        foreach ($branch in $branches) {
+            $result.add([PSCustomObject]@{
+                    Name          = $branch.name
+                    CanonicalName = $branch.CanonicalName
+                    IsDefault     = if ($branch.name -eq $project.PersistenceSettings.defaultBranch) { $True }else { $false }
+                })
+        }
+
+        @(, $result)
     }
-
-    @(, $result)
 }

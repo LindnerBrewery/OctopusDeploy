@@ -45,7 +45,12 @@
 
     )
     begin {
-        Test-OctopusConnection | Out-Null
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
         $all = $repo._repository.runbooks.findall()
     }
     process {

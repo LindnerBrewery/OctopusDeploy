@@ -25,7 +25,12 @@
         $Runbook
     )
     begin {
-        Test-OctopusConnection | Out-Null
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
     }
     process {
             return $repo._repository.RunbookProcesses.Get($Runbook.RunbookProcessId)

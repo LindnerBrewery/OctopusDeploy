@@ -46,7 +46,12 @@
 
     )
     begin {
-        Test-OctopusConnection | Out-Null
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
         if ($IncludeTenantNames.IsPresent) {
             $tenant = Get-Tenant
         }

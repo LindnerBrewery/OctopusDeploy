@@ -1,5 +1,5 @@
 ﻿function Copy-MachinePolicy {
-<#
+    <#
 .SYNOPSIS
     Function not finished but working
     Creates a copy of a given machine policy
@@ -14,21 +14,25 @@
         [Octopus.Client.Model.MachinePolicyResource]$MachinePolicy,
         [Switch]$IsDefault
     )
-    # TODO: update params with completers and documentation
-    Test-OctopusConnection | Out-Null
-    $newPolicy = [Octopus.Client.Model.MachinePolicyResource]::new()
-    $newPolicy = $MachinePolicy = $repo._repository.MachinePolicies.Get($MachinePolicy.ID)
-    $newPolicy.Name = $Name
-    if (-not ($IsDefault.isPresent)) {
-        $newPolicy.IsDefault = $False
+    begin {
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
     }
-    $repo._repository.MachinePolicies.Create($newPolicy)# | Out-Null
+    process {
+        # TODO: update params with completers and documentation
+        Test-OctopusConnection | Out-Null
+        $newPolicy = [Octopus.Client.Model.MachinePolicyResource]::new()
+        $newPolicy = $MachinePolicy = $repo._repository.MachinePolicies.Get($MachinePolicy.ID)
+        $newPolicy.Name = $Name
+        if (-not ($IsDefault.isPresent)) {
+            $newPolicy.IsDefault = $False
+        }
+        $repo._repository.MachinePolicies.Create($newPolicy)# | Out-Null
+    }
 }
 
 
-
-$defaultPolicy.psobject.Properties
-$properties = $defaultPolicy.psobject.Properties | Where-Object membertype -EQ "Property" | Select-Object name
-foreach ($prop in $properties) {
-
-}

@@ -21,7 +21,12 @@
 
     )
     begin {
-        Test-OctopusConnection | out-null
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
         $deletedCounter  = 0
     }
     Process {

@@ -9,7 +9,8 @@ $private = @(Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Priv
 foreach ($import in @($public + $private)) {
     try {
         . $import.FullName
-    } catch {
+    }
+    catch {
         throw "Unable to dot source [$($import.FullName)]"
     }
 }
@@ -17,11 +18,15 @@ foreach ($import in @($public + $private)) {
 Export-ModuleMember -Function $public.Basename
 
 # connect to octopus if connection data are present
-try{
+try {
     Connect-Octopus
-} catch {
-    Write-Warning $_.Exception.Message
-    #Write-Warning "Unable to connect to Octopus Deploy server. Please use the Connect-Octopus cmdlet to connect to the server"
+}
+catch {
+    #only print warning if the module was imported explicitly
+    if ($MyInvocation.Statement) {
+        Write-Warning $_.Exception.Message
+        #Write-Warning "Unable to connect to Octopus Deploy server. Please use the Connect-Octopus cmdlet to connect to the server"
+    }
 }
 
 

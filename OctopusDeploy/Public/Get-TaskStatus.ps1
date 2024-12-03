@@ -18,6 +18,12 @@
         [switch]$ExludeCanceled
     )
     begin {
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
         # use this approach to set a default view without a type definition . alternatively use formaters
         $defaultProperties = @('TaskType', 'ID', 'Description', 'Status')
         $defaultDisplayPropertySet = New-Object System.Management.Automation.PSPropertySet(‘DefaultDisplayPropertySet’, [string[]]$defaultProperties)

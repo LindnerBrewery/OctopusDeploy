@@ -32,17 +32,25 @@
         $ID
 
     )
-    Test-OctopusConnection | Out-Null
-    $result = [System.Collections.Generic.List[Octopus.Client.Model.ProjectGroupResource]]::new()
-    $result = $repo._repository.ProjectGroups.FindAll()
-    if ($PSCmdlet.ParameterSetName -eq "default") {
-        return $result
+    begin {
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
     }
-    if ($PSCmdlet.ParameterSetName -eq "byID") {
-        return ($result | Where-Object ID -EQ $ID)
+    process {
+        $result = [System.Collections.Generic.List[Octopus.Client.Model.ProjectGroupResource]]::new()
+        $result = $repo._repository.ProjectGroups.FindAll()
+        if ($PSCmdlet.ParameterSetName -eq "default") {
+            return $result
+        }
+        if ($PSCmdlet.ParameterSetName -eq "byID") {
+            return ($result | Where-Object ID -EQ $ID)
+        }
+        if ($PSCmdlet.ParameterSetName -eq "byName") {
+            return ($result | Where-Object Name -EQ $Name)
+        }
     }
-    if ($PSCmdlet.ParameterSetName -eq "byName") {
-        return ($result | Where-Object Name -EQ $Name)
-    }
-
 }

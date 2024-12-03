@@ -1,5 +1,5 @@
 ﻿function Get-Project {
-<#
+    <#
 .SYNOPSIS
     Returns a list of available projects
 .DESCRIPTION
@@ -29,23 +29,35 @@
         $ID
 
     )
-    Test-OctopusConnection | out-null
-    if ($PSCmdlet.ParameterSetName -eq 'Name' -and ([String]::IsNullOrEmpty($Name))) {
-        $result = $repo._repository.Projects.getall()
-    }elseif ($PSCmdlet.ParameterSetName -eq 'Name') {
-        #$result =$name | ForEach-Object {$repo._repository.Projects.findbyname("$_")}
-        $result = $repo._repository.Projects.findbyname("$name")
-    }
-    if ($PSCmdlet.ParameterSetName -eq 'ID') {
+    begin {
         try {
-            $result = $repo._repository.Projects.get("$id")
-        } catch {}
-
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
     }
+    process {
 
-    if (!($result)) {
-        $message = "There is no project with the {0} `"{1}{2}`"" -f $PSCmdlet.ParameterSetName, $name, $ID
-        Throw $message
+        if ($PSCmdlet.ParameterSetName -eq 'Name' -and ([String]::IsNullOrEmpty($Name))) {
+            $result = $repo._repository.Projects.getall()
+        }
+        elseif ($PSCmdlet.ParameterSetName -eq 'Name') {
+            #$result =$name | ForEach-Object {$repo._repository.Projects.findbyname("$_")}
+            $result = $repo._repository.Projects.findbyname("$name")
+        }
+        if ($PSCmdlet.ParameterSetName -eq 'ID') {
+            try {
+                $result = $repo._repository.Projects.get("$id")
+            }
+            catch {}
+            
+        }
+        
+        if (!($result)) {
+            $message = "There is no project with the {0} `"{1}{2}`"" -f $PSCmdlet.ParameterSetName, $name, $ID
+            Throw $message
+        }
+        $result
     }
-    $result
 }

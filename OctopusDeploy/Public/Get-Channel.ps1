@@ -39,19 +39,30 @@
         $ID
 
     )
-    Test-OctopusConnection | Out-Null
-    $result = [System.Collections.ArrayList]::new()
-    $result = $repo._repository.Channels.FindAll()
-    if ($PSCmdlet.ParameterSetName -eq "default") {
-        if ($Project) {
-            $result = $result | Where-Object ProjectID -Like $Project.ID
+    begin {
+        try {
+            ValidateConnection
         }
-        if ($Name) {
-            $result = $result | Where-Object Name -Like $name
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
         }
-    } elseif ($PSCmdlet.ParameterSetName -eq "byID") {
-        $result = $result | Where-Object ID -EQ $ID
     }
+    
+    process {
+        $result = [System.Collections.ArrayList]::new()
+        $result = $repo._repository.Channels.FindAll()
+        if ($PSCmdlet.ParameterSetName -eq "default") {
+            if ($Project) {
+                $result = $result | Where-Object ProjectID -Like $Project.ID
+            }
+            if ($Name) {
+                $result = $result | Where-Object Name -Like $name
+            }
+        }
+        elseif ($PSCmdlet.ParameterSetName -eq "byID") {
+            $result = $result | Where-Object ID -EQ $ID
+        }
 
-    $result
+        $result
+    }
 }

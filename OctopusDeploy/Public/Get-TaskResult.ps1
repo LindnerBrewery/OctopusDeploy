@@ -18,7 +18,14 @@
         [Octopus.Client.Model.TaskResource]
         $Task
     )
-    begin { Test-OctopusConnection | Out-Null }
+    begin { 
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+     }
     process {
         #if ((Get-TaskStatus -ID $Task.id).status -eq "completed") {
         #}

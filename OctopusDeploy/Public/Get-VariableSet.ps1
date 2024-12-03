@@ -18,7 +18,12 @@
     )
     begin {
         # testing connection to octopus
-        Test-OctopusConnection | Out-Null
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
     }
     process {
 

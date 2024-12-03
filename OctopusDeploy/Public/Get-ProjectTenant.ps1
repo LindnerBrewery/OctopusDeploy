@@ -38,8 +38,11 @@ function Get-ProjectTenant {
     )
 
     begin {
-        if (! (Test-OctopusConnection)){
-            Throw "No connection to octopus server"
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
         }
         $tenant = Get-Tenant
     }

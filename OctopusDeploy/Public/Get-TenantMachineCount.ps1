@@ -38,7 +38,12 @@
 
     )
     begin {
-        Test-OctopusConnection | Out-Null
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
         $boundParams = $PSBoundParameters
         <#$splat = @{}
         if ($boundParams.online) {

@@ -49,12 +49,11 @@
 
     )
     Begin {
-        if (!(Test-OctopusConnection)) {
-
-            $errorRecord = [System.Management.Automation.ErrorRecord]::new("No connection to octopus server", $null, 'ConnectionError', $null)
-            $PSCmdlet.ThrowTerminatingError($errorRecord )
-            #$PSCmdlet.WriteError($errorRecord )
-
+        try {
+            ValidateConnection
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
         }
     }
     Process {
