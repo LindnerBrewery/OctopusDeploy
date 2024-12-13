@@ -6,11 +6,14 @@
     Runs a runbook snapshot on one or more specified tenants. Scheduling is optional
 .EXAMPLE
     PS C:\> Invoke-RunbookRun -RunbookSnapshot "RunbookSnapshots-1541" -Tenant XXROM001  -Environment Production
-    Runs the Runbook Snapshot with the ID "RunbookSnapshots-1541" on the defined tenant in th production environment
+    Runs the Runbook Snapshot with the ID "RunbookSnapshots-1541" on the defined tenant in the production environment
 .EXAMPLE
-    PS C:\> Invoke-RunbookRun -Runbook "" -Tenant XXROM001  -Environment Production
-    Runs the Runbook Snapshot with the ID "RunbookSnapshots-1541" on the defined tenant in th production environment
-
+    PS C:\> Invoke-RunbookRun -Runbook "TestRunbookWithoutVars"   -Environment Production
+    Runs the latest untenanted Runbook Snapshot with the ID "RunbookSnapshots-1541" in the production environment.
+.EXAMPLE
+    PS C:\> $runbookSnapshot = Get-RunbookSnapshot -Runbook TestRunbook -latest
+    PS C:\> Invoke-RunbookRun -Runbook $runbookSnapshot -Tenant XXROM001, XXROM002 -Environment Production -FormValue @{'TestVar' = 'bla'}
+    Runs the latest Runbook Snapshot on the defined tenants in th production environment and sets the variable 'TestVar' to 'bla'
 #>
     [CmdletBinding(DefaultParameterSetName = 'default',
         SupportsShouldProcess = $true,
