@@ -12,7 +12,7 @@
     Returns a single artifact
 .EXAMPLE
     PS C:\>  $snapshot = Get-Runbook -Name "Get Customer Configuration" | Get-RunbookSnapshot -latest
-    PS C:\> Get-Artifact -Regarding $snap
+    PS C:\> Get-Artifact -Regarding $snapshot
     Returns all artifacts a the latest runbook snapshot
 #>
     [CmdletBinding(DefaultParameterSetName = "default")]

@@ -5,9 +5,9 @@
         [Parameter(mandatory = $true,
             ValueFromPipelineByPropertyName = $true )]
         [ValidateNotNullOrEmpty()]
-        [Alias("ID")]
+        [Alias("ArtifactId")]
         [String[]]
-        $ArtifactID,
+        $Id,
         [Parameter(mandatory = $true )]
         [ValidateNotNullOrEmpty()]
         [String]
@@ -27,7 +27,7 @@
         }
     }
     Process {
-        foreach ($_ArtifactID in $ArtifactID) {
+        foreach ($_ArtifactID in $Id) {
             Write-Verbose "Retrieving artifact for ID $_ArtifactID "
             $artifact = $repo._repository.Artifacts.Get("$_ArtifactID")
             Write-Verbose "Retrieving content from $($artifact.ID)"
