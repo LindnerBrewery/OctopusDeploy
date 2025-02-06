@@ -56,8 +56,8 @@
                 Throw "The `"$($Project.name)`" project is not connected to $($tenant.name)"
             }
             catch {
-                $cmdlet.WriteError($_)
-                Return
+                $pscmdlet.WriteError($_)
+                Return 
             }
         }
         if ($environment) {
@@ -70,7 +70,7 @@
                 Throw "There are no variables in $($Environment.name)"
             }
             catch {
-                $cmdlet.WriteError($_)
+                $pscmdlet.WriteError($_)
                 Return
             }
         }
