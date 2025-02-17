@@ -4,7 +4,7 @@
     octopusdeploy\Get-Environment | Where-Object name -Like $stringMatch* | Sort-Object -Property name | Select-Object -ExpandProperty name | ForEach-Object {
         # If the result contains a white pace, then enclose it with quotation marks
         if ($_.toCharArray() -contains ' ') {
-            [System.Management.Automation.CompletionResult]::new($_, "'$_'", 'ParameterValue', $_)
+            [System.Management.Automation.CompletionResult]::new("'$_'", $_, 'ParameterValue', $_)
         }
         else {
             [System.Management.Automation.CompletionResult]::new($_, $_ , 'ParameterValue', $_)
@@ -17,7 +17,7 @@ $acScriptProject = {
     $stringMatch = $stringMatch.trim("'") # remove ' from search string if there was an space in the word
     octopusdeploy\Get-Project | Where-Object name -Like $stringMatch* | Sort-Object -Property name | Select-Object -ExpandProperty name | ForEach-Object {
         if ($_.toCharArray() -contains ' ') {
-            [System.Management.Automation.CompletionResult]::new($_, "'$_'", 'ParameterValue', $_)
+            [System.Management.Automation.CompletionResult]::new("'$_'", $_, 'ParameterValue', $_)
         }
         else {
             [System.Management.Automation.CompletionResult]::new($_, $_ , 'ParameterValue', $_)
@@ -30,7 +30,7 @@ $acScriptTenant = {
     $stringMatch = $stringMatch.trim("'") # remove ' from search string if there was an space in the word
     octopusdeploy\Get-Tenant | Where-Object name -Like $stringMatch* | Sort-Object -Property name | Select-Object -ExpandProperty name | ForEach-Object {
         if ($_.toCharArray() -contains ' ') {
-            [System.Management.Automation.CompletionResult]::new($_, "'$_'", 'ParameterValue', $_)
+            [System.Management.Automation.CompletionResult]::new("'$_'", $_, 'ParameterValue', $_)
         }
         else {
             [System.Management.Automation.CompletionResult]::new($_, $_ , 'ParameterValue', $_)
@@ -43,7 +43,7 @@ $acScriptMachineRole = {
     $stringMatch = $stringMatch.trim("'") # remove ' from search string if there was an space in the word
     Get-MachineRole | Where-Object { $_ -Like "$stringMatch*" } | Sort-Object | ForEach-Object {
         if ($_.toCharArray() -contains ' ') {
-            [System.Management.Automation.CompletionResult]::new($_, "'$_'", 'ParameterValue', $_)
+            [System.Management.Automation.CompletionResult]::new("'$_'", $_, 'ParameterValue', $_)
         }
         else {
             [System.Management.Automation.CompletionResult]::new($_, $_ , 'ParameterValue', $_)
@@ -56,7 +56,7 @@ $acScriptTagSet = {
     $stringMatch = $stringMatch.trim("'") # remove ' from search string if there was an space in the word
     Get-TagSet | Where-Object { $_.name -Like "$stringMatch*" } | Sort-Object -Property name | Select-Object -ExpandProperty name | ForEach-Object {
         if ($_.toCharArray() -contains ' ') {
-            [System.Management.Automation.CompletionResult]::new($_, "'$_'", 'ParameterValue', $_)
+            [System.Management.Automation.CompletionResult]::new("'$_'", $_, 'ParameterValue', $_)
         }
         else {
             [System.Management.Automation.CompletionResult]::new($_, $_ , 'ParameterValue', $_)
@@ -68,7 +68,7 @@ $acScriptCanonicalTagName = {
     $stringMatch = $stringMatch.trim("'") # remove ' from search string if there was an space in the word
     Get-TagSet -CanonicalTagName | Where-Object { $_ -Like "$stringMatch*" } | Sort-Object   | ForEach-Object {
         if ($_.toCharArray() -contains ' ') {
-            [System.Management.Automation.CompletionResult]::new($_, "'$_'", 'ParameterValue', $_)
+            [System.Management.Automation.CompletionResult]::new("'$_'", $_, 'ParameterValue', $_)
         }
         else {
             [System.Management.Automation.CompletionResult]::new($_, $_ , 'ParameterValue', $_)
@@ -81,7 +81,7 @@ $acScriptMachine = {
     $stringMatch = $stringMatch.trim("'") # remove ' from search string if there was an space in the word
     Get-Machine | Where-Object { $_.name -Like "$stringMatch*" } | Sort-Object -Property name | Select-Object -ExpandProperty name | ForEach-Object {
         if ($_.toCharArray() -contains ' ') {
-            [System.Management.Automation.CompletionResult]::new($_, "'$_'", 'ParameterValue', $_)
+            [System.Management.Automation.CompletionResult]::new("'$_'", $_, 'ParameterValue', $_)
         }
         else {
             [System.Management.Automation.CompletionResult]::new($_, $_ , 'ParameterValue', $_)
@@ -101,7 +101,7 @@ $acScriptTaskType = {
         $stringMatch = $stringMatch.trim("'") # remove ' from search string if there was an space in the word
         Get-Runbook | Where-Object { $_.name -Like "$stringMatch*" } | Sort-Object -Property name | Select-Object -ExpandProperty name | ForEach-Object {
             if ($_.toCharArray() -contains ' ') {
-                [System.Management.Automation.CompletionResult]::new($_, "'$_'", 'ParameterValue', $_)
+                [System.Management.Automation.CompletionResult]::new("'$_'", $_, 'ParameterValue', $_)
             }
             else {
                 [System.Management.Automation.CompletionResult]::new($_, $_ , 'ParameterValue', $_)
@@ -113,7 +113,7 @@ $acScriptTaskType = {
         $stringMatch = $stringMatch.trim("'") # remove ' from search string if there was an space in the word
         Get-VariableSet | Where-Object { $_.name -Like "$stringMatch*" } | Sort-Object -Property name | Select-Object -ExpandProperty name | ForEach-Object {
             if ($_.toCharArray() -contains ' ') {
-                [System.Management.Automation.CompletionResult]::new($_, "'$_'", 'ParameterValue', $_)
+                [System.Management.Automation.CompletionResult]::new("'$_'", $_, 'ParameterValue', $_)
             }
             else {
                 [System.Management.Automation.CompletionResult]::new($_, $_ , 'ParameterValue', $_)
@@ -126,7 +126,7 @@ $acScriptTaskType = {
         $stringMatch = $stringMatch.trim("'") # remove ' from search string if there was an space in the word
         Get-ProjectGroup | Where-Object { $_.name -Like "$stringMatch*" } | Sort-Object -Property name | Select-Object -ExpandProperty name | ForEach-Object {
             if ($_.toCharArray() -contains ' ') {
-                [System.Management.Automation.CompletionResult]::new($_, "'$_'", 'ParameterValue', $_)
+                [System.Management.Automation.CompletionResult]::new("'$_'", $_, 'ParameterValue', $_)
             }
             else {
                 [System.Management.Automation.CompletionResult]::new($_, $_ , 'ParameterValue', $_)
@@ -139,7 +139,7 @@ $acScriptTaskType = {
         $stringMatch = $stringMatch.trim("'") # remove ' from search string if there was an space in the word
         Get-Lifecycle | Where-Object { $_.name -Like "$stringMatch*" } | Sort-Object -Property name | Select-Object -ExpandProperty name | ForEach-Object {
             if ($_.toCharArray() -contains ' ') {
-                [System.Management.Automation.CompletionResult]::new($_, "'$_'", 'ParameterValue', $_)
+                [System.Management.Automation.CompletionResult]::new("'$_'", $_, 'ParameterValue', $_)
             }
             else {
                 [System.Management.Automation.CompletionResult]::new($_, $_ , 'ParameterValue', $_)
@@ -152,7 +152,7 @@ $acScriptTaskType = {
         $stringMatch = $stringMatch.trim("'") # remove ' from search string if there was an space in the word
         Get-ProjectTrigger | Where-Object { $_.name -Like "$stringMatch*" } | Sort-Object -Property name | Select-Object -ExpandProperty name | ForEach-Object {
             if ($_.toCharArray() -contains ' ') {
-                [System.Management.Automation.CompletionResult]::new($_, "'$_'", 'ParameterValue', $_)
+                [System.Management.Automation.CompletionResult]::new("'$_'", $_, 'ParameterValue', $_)
             }
             else {
                 [System.Management.Automation.CompletionResult]::new($_, $_ , 'ParameterValue', $_)
@@ -165,7 +165,7 @@ $acScriptTaskType = {
         $stringMatch = $stringMatch.trim("'") # remove ' from search string if there was an space in the word
         Get-Space | Where-Object { $_.name -Like "$stringMatch*" } | Sort-Object -Property name | Select-Object -ExpandProperty name | ForEach-Object {
             if ($_.toCharArray() -contains ' ') {
-                [System.Management.Automation.CompletionResult]::new($_, "'$_'", 'ParameterValue', $_)
+                [System.Management.Automation.CompletionResult]::new("'$_'", $_, 'ParameterValue', $_)
             }
             else {
                 [System.Management.Automation.CompletionResult]::new($_, $_ , 'ParameterValue', $_)
