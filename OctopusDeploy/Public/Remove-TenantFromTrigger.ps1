@@ -7,13 +7,8 @@ function Remove-TenantFromTrigger {
 .EXAMPLE
     PS C:\> Remove-TenantFromTrigger -ProjectTrigger $trigger -Tenant $tenant
     Removes the tenant $tenant from the project trigger $trigger. $tenant can be a single tenant.
-.EXAMPLE
-    PS C:\> $trigger = Get-ProjectTrigger -Project $project
-    PS C:\> $tenants = Get-ProjectTenant -Project 'Project Name' -Environment Production
-    PS C:\> Remove-TenantFromTrigger -ProjectTrigger $trigger -Tenant $tenants
-    First the project trigger is retrieved. Then the tenants are retrieved that are associated with the project in the production environment. Finally the tenants are removed from the project trigger.
 .PARAMETER ProjectTrigger
-    The project trigger(s) from which the tenant(s) should be removed
+    The project trigger(s) from which the tenant should be removed
 .PARAMETER Tenant
     The tenant that should be removed from the project trigger
 #>
