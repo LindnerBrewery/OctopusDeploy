@@ -1,33 +1,33 @@
 function Remove-TenantFromTrigger {
     <#
 .SYNOPSIS
-    Removes one or more tenants from a project trigger
+    Removes one tenant from project triggers
 .DESCRIPTION
-    Removes one or more tenants from a project trigger
+    Removes one tenant from project triggers
 .EXAMPLE
     PS C:\> Remove-TenantFromTrigger -ProjectTrigger $trigger -Tenant $tenant
-    Removes the tenant $tenant from the project trigger $trigger. $tenant can be one or more tenants.
+    Removes the tenant $tenant from the project trigger $trigger. $tenant can be a single tenant.
 .EXAMPLE
     PS C:\> $trigger = Get-ProjectTrigger -Project $project
     PS C:\> $tenants = Get-ProjectTenant -Project 'Project Name' -Environment Production
     PS C:\> Remove-TenantFromTrigger -ProjectTrigger $trigger -Tenant $tenants
     First the project trigger is retrieved. Then the tenants are retrieved that are associated with the project in the production environment. Finally the tenants are removed from the project trigger.
 .PARAMETER ProjectTrigger
-    The project trigger from which the tenant(s) should be removed
+    The project trigger(s) from which the tenant(s) should be removed
 .PARAMETER Tenant
-    The tenant(s) that should be removed from the project trigger
+    The tenant that should be removed from the project trigger
 #>
     [CmdletBinding()]
     param (
         [Parameter(mandatory = $true)]
-        [ProjectTriggerSingleTransformation()]
-        [Octopus.Client.Model.ProjectTriggerResource]
+        [ProjectTriggerTransformation()]
+        [Octopus.Client.Model.ProjectTriggerResource[]]
         $ProjectTrigger,
         [Parameter(mandatory,
             valueFromPipeline = $true)]
         [ValidateNotNullOrEmpty()]
-        [TenantTransformation()]
-        [Octopus.Client.Model.TenantResource[]]
+        [TenantSingleTransformation()]
+        [Octopus.Client.Model.TenantResource]
         $Tenant
     )
 
@@ -41,18 +41,19 @@ function Remove-TenantFromTrigger {
 
     process {
         # Remove the tenant from the project trigger
-        foreach ($_tenant in $Tenant) {
-            $result = $ProjectTrigger.Action.TenantIds.Remove($_tenant.id)
-            if ($result) {
-                Write-Verbose "Removed tenant $($_tenant.Name) from project trigger $($ProjectTrigger.Name)"
-            } else {
-                Write-Verbose "Tenant $($_tenant.Name) is not connected to the project trigger $($ProjectTrigger.Name)"
+        foreach ($trigger in $ProjectTrigger) {
+            $result = $trigger.Action.TenantIds.Remove($Tenant.id)
+            if (-not $result) {
+                Write-Verbose "Tenant $($Tenant.Name) is not connected to the project trigger $($trigger.Name)"
+                continue
             }
-        }
-        try {
-            $repo._repository.ProjectTriggers.Modify($ProjectTrigger)
-        } catch {
-            $PSCmdlet.WriteError($_)
+
+            try {
+                $null = $repo._repository.ProjectTriggers.Modify($trigger)
+                Write-Verbose "Removed tenant $($Tenant.Name) from project trigger $($trigger.Name)"
+            } catch {
+                $PSCmdlet.WriteError($_)
+            }
         }
 
     }

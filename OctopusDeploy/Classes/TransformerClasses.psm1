@@ -220,3 +220,18 @@ class ProjectTriggerSingleTransformation : System.Management.Automation.Argument
     }
 
 }
+
+class ProjectTriggerTransformation : System.Management.Automation.ArgumentTransformationAttribute {
+    [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
+        $result = @()
+        foreach ($item in $InputData) {
+            if ($item -is [string] -and $item -like "ProjectTriggers-*") {
+                $item = Get-ProjectTrigger -ID "$item"
+            } elseif ($item -is [string]) {
+                $item = Get-ProjectTrigger -Name "$item"
+            }
+            $result += ($item)
+        }
+        return ($result)
+    }
+}
