@@ -72,7 +72,15 @@
         #Test-OctopusConnection | Out-Null
         $result = $allmachines
         if ($PSCmdlet.ParameterSetName -eq 'byName') {
-            $result = $repo._repository.Machines.findbyname("$name")
+            if ($name -like '*`**') {
+                # Handle wildcard search
+                $searchComponents = $name -split '\*' | Where-Object { $_ -ne '' }
+                $longestComponent = $searchComponents | Sort-Object Length -Descending | Select-Object -First 1
+                $machineWithPartialName = $repo._repository.Machines.FindByPartialName($longestComponent)
+                $result = $machineWithPartialName | Where-Object Name -Like $name
+            } else {
+                $result = $repo._repository.Machines.FindByName("$name")
+            }
         }
         if ($PSCmdlet.ParameterSetName -eq 'byID') {
             $result = $repo._repository.Machines.get("$id")
