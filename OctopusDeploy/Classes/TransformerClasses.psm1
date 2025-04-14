@@ -220,7 +220,6 @@ class ProjectTriggerSingleTransformation : System.Management.Automation.Argument
     }
 
 }
-
 class ProjectTriggerTransformation : System.Management.Automation.ArgumentTransformationAttribute {
     [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
         $result = @()
@@ -233,5 +232,16 @@ class ProjectTriggerTransformation : System.Management.Automation.ArgumentTransf
             $result += ($item)
         }
         return ($result)
+    }
+}
+class TaskSingleTransformation : System.Management.Automation.ArgumentTransformationAttribute {
+    [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
+        $item = $InputData
+        if ($item -is [string] -and $item -like "ServerTasks-*") {
+            $item = Get-Task -TaskID "$item"
+        } elseif ($item -is [string]) {
+            $item = $null
+        }
+        return ($item)
     }
 }
