@@ -5,3 +5,12 @@ $repo = Get-OctopusRepositoryObject
 foreach ($task in $tasks) {
     $repo._repository.Tasks.Cancel($task)
 }
+
+$rb = Get-Runbook -Name "Edit Config File"
+$rbs = Get-RunbookSnapshot -Runbook $rb -Published
+$tasks = Get-Task -Regarding $rbs | Where state -eq "Queued"
+
+$repo = Get-OctopusRepositoryObject
+foreach ($task in $tasks) {
+    $repo._repository.Tasks.Cancel($task)
+}
