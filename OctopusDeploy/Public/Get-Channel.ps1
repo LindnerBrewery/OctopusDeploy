@@ -53,7 +53,7 @@
         $result = $repo._repository.Channels.FindAll()
         if ($PSCmdlet.ParameterSetName -eq "default") {
             if ($Project) {
-                $result = $result | Where-Object ProjectID -Like $Project.ID
+                $result = $result | Where-Object ProjectID -Like $Project.ID | Sort-Object id -Unique
             }
             if ($Name) {
                 $result = $result | Where-Object Name -Like $name
