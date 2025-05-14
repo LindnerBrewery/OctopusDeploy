@@ -4,7 +4,8 @@
         foreach ($item in $InputData) {
             if ($item -is [string] -and $item -like "Projects-*") {
                 $item = Get-Project -ID $item
-            } elseif ($item -is [string]) {
+            }
+            elseif ($item -is [string]) {
                 $item = Get-Project -Name $item
             }
             $result += ($item)
@@ -17,11 +18,14 @@ class ProjectSingleTransformation : System.Management.Automation.ArgumentTransfo
     [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
         if ($InputData -is [string] -and $InputData -like "Projects-*") {
             $item = Get-Project -ID "$InputData"
-        } elseif ($InputData -is [string]) {
+        }
+        elseif ($InputData -is [string]) {
             $item = Get-Project -Name "$InputData"
-        } elseif ($InputData -is [Octopus.Client.Model.ProjectResource]) {
+        }
+        elseif ($InputData -is [Octopus.Client.Model.ProjectResource]) {
             $item = $InputData
-        } else {
+        }
+        else {
             $item = $null
         }
         return ($item)
@@ -33,9 +37,10 @@ class TenantTransformation : System.Management.Automation.ArgumentTransformation
         $result = @()
         foreach ($item in $InputData) {
             if ($item -is [string] -and $item -like "Tenants-*") {
-                $item = get-tenant -id "$item"
-            } elseif ($item -is [string]) {
-                $item = get-tenant -name "$item"
+                $item = Get-Tenant -ID "$item"
+            }
+            elseif ($item -is [string]) {
+                $item = Get-Tenant -Name "$item"
             }
             $result += ($item)
         }
@@ -46,9 +51,10 @@ class TenantSingleTransformation : System.Management.Automation.ArgumentTransfor
     [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
         $item = $InputData
         if ($item -is [string] -and $item -like "Tenants-*") {
-            $item = get-tenant -id "$item"
-        } elseif ($item -is [string]) {
-            $item = get-tenant -name "$item"
+            $item = Get-Tenant -ID "$item"
+        }
+        elseif ($item -is [string]) {
+            $item = Get-Tenant -Name "$item"
         }
         return ($item)
     }
@@ -60,7 +66,8 @@ class EnvironmentTransformation : System.Management.Automation.ArgumentTransform
         foreach ($item in $InputData) {
             if ($item -is [string] -and $item -like "Environments-*") {
                 $item = Get-Environment -ID $item
-            } elseif ($item -is [string]) {
+            }
+            elseif ($item -is [string]) {
                 $item = Get-Environment -Name $item
             }
             $result += ($item)
@@ -73,7 +80,8 @@ class EnvironmentSingleTransformation : System.Management.Automation.ArgumentTra
         $item = $InputData
         if ($item -is [string] -and $item -like "Environments-*") {
             $item = Get-Environment -ID $item
-        } elseif ($item -is [string]) {
+        }
+        elseif ($item -is [string]) {
             $item = Get-Environment -Name $item
         }
         return $item
@@ -84,7 +92,8 @@ class ChannelTransformation : System.Management.Automation.ArgumentTransformatio
         $item = $InputData
         if ($item -is [string] -and $item -like "Channels-*") {
             $item = Get-Channel -ID $item
-        } elseif ($item -is [string]) {
+        }
+        elseif ($item -is [string]) {
             $item = Get-Channel -Name $item
         }
         return $item
@@ -96,9 +105,10 @@ class MachineTransformation : System.Management.Automation.ArgumentTransformatio
         $result = @()
         foreach ($item in $InputData) {
             if ($item -is [string] -and $item -like "Machines-*") {
-                $item = Get-Machine -id "$item"
-            } elseif ($item -is [string]) {
-                $item = Get-Machine -name "$item"
+                $item = Get-Machine -ID "$item"
+            }
+            elseif ($item -is [string]) {
+                $item = Get-Machine -Name "$item"
             }
             $result += ($item)
         }
@@ -110,9 +120,10 @@ class MachineSingleTransformation : System.Management.Automation.ArgumentTransfo
     [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
         $item = $InputData
         if ($item -is [string] -and $item -like "Machines-*") {
-            $item = Get-Machine -id "$item"
-        } elseif ($item -is [string]) {
-            $item = Get-Machine -name "$item"
+            $item = Get-Machine -ID "$item"
+        }
+        elseif ($item -is [string]) {
+            $item = Get-Machine -Name "$item"
         }
         return ($item)
     }
@@ -124,9 +135,10 @@ class RunbookTransformation : System.Management.Automation.ArgumentTransformatio
         $result = @()
         foreach ($item in $InputData) {
             if ($item -is [string] -and $item -like "Runbooks-*") {
-                $item = Get-Runbook -id "$item"
-            } elseif ($item -is [string]) {
-                $item = Get-Runbook -name "$item"
+                $item = Get-Runbook -ID "$item"
+            }
+            elseif ($item -is [string]) {
+                $item = Get-Runbook -Name "$item"
             }
             $result += ($item)
         }
@@ -138,9 +150,10 @@ class RunbookSingleTransformation : System.Management.Automation.ArgumentTransfo
     [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
         $item = $InputData
         if ($item -is [string] -and $item -like "Runbooks-*") {
-            $item = Get-Runbook -id "$item"
-        } elseif ($item -is [string]) {
-            $item = Get-Runbook -name "$item"
+            $item = Get-Runbook -ID "$item"
+        }
+        elseif ($item -is [string]) {
+            $item = Get-Runbook -Name "$item"
         }
         return ($item)
     }
@@ -151,8 +164,9 @@ class RunbookSnapshotSingleTransformation : System.Management.Automation.Argumen
     [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
         $item = $InputData
         if ($item -is [string] -and $item -like "RunbookSnapshots-*") {
-            $item = Get-RunbookSnapshot -id "$item"
-        } elseif ($item -is [string]) {
+            $item = Get-RunbookSnapshot -ID "$item"
+        }
+        elseif ($item -is [string]) {
             $item = $null
         }
         return ($item)
@@ -164,8 +178,9 @@ class ArtifactSingleTransformation : System.Management.Automation.ArgumentTransf
     [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
         $item = $InputData
         if ($item -is [string] -and $item -like "Artifacts-*") {
-            $item = Get-Artifact -id "$item"
-        } elseif ($item -is [string]) {
+            $item = Get-Artifact -ID "$item"
+        }
+        elseif ($item -is [string]) {
             $item = $null
         }
         return ($item)
@@ -178,8 +193,9 @@ class LibraryVariableSetSingleTransformation : System.Management.Automation.Argu
         $item = $InputData
         if ($item -is [string] -and $item -like " LibraryVariableSets-*") {
             $item = Get-VariableSet -id "$item"
-        } elseif ($item -is [string]) {
-            $item = Get-VariableSet -name "$item"
+        }
+        elseif ($item -is [string]) {
+            $item = Get-VariableSet -Name "$item"
         }
         return ($item)
     }
@@ -188,9 +204,10 @@ class ProjectGroupSingleTransformation : System.Management.Automation.ArgumentTr
     [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
         $item = $InputData
         if ($item -is [string] -and $item -like "ProjectGroups-*") {
-            $item = Get-ProjectGroup -id "$item"
-        } elseif ($item -is [string]) {
-            $item = Get-ProjectGroup -name "$item"
+            $item = Get-ProjectGroup -ID "$item"
+        }
+        elseif ($item -is [string]) {
+            $item = Get-ProjectGroup -Name "$item"
         }
         return ($item)
     }
@@ -200,9 +217,10 @@ class LifecycleSingleTransformation : System.Management.Automation.ArgumentTrans
     [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
         $item = $InputData
         if ($item -is [string] -and $item -like "Lifecycles-*") {
-            $item = Get-Lifecycle -id "$item"
-        } elseif ($item -is [string]) {
-            $item = Get-Lifecycle -name "$item"
+            $item = Get-Lifecycle -ID "$item"
+        }
+        elseif ($item -is [string]) {
+            $item = Get-Lifecycle -Name "$item"
         }
         return ($item)
     }
@@ -212,9 +230,10 @@ class ProjectTriggerSingleTransformation : System.Management.Automation.Argument
     [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
         $item = $InputData
         if ($item -is [string] -and $item -like "ProjectTriggers-*") {
-            $item = Get-ProjectTrigger -id "$item"
-        } elseif ($item -is [string]) {
-            $item = Get-ProjectTrigger -name "$item"
+            $item = Get-ProjectTrigger -ID "$item"
+        }
+        elseif ($item -is [string]) {
+            $item = Get-ProjectTrigger -Name "$item"
         }
         return ($item)
     }
@@ -226,7 +245,8 @@ class ProjectTriggerTransformation : System.Management.Automation.ArgumentTransf
         foreach ($item in $InputData) {
             if ($item -is [string] -and $item -like "ProjectTriggers-*") {
                 $item = Get-ProjectTrigger -ID "$item"
-            } elseif ($item -is [string]) {
+            }
+            elseif ($item -is [string]) {
                 $item = Get-ProjectTrigger -Name "$item"
             }
             $result += ($item)
@@ -239,9 +259,40 @@ class TaskSingleTransformation : System.Management.Automation.ArgumentTransforma
         $item = $InputData
         if ($item -is [string] -and $item -like "ServerTasks-*") {
             $item = Get-Task -TaskID "$item"
-        } elseif ($item -is [string]) {
+        }
+        elseif ($item -is [string]) {
             $item = $null
         }
         return ($item)
+    }
+}
+
+class InterventionRegardingStringTransformation : System.Management.Automation.ArgumentTransformationAttribute {
+    [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
+        if ($InputData -is [Octopus.Client.Model.Resource]) {
+            return $InputData.id
+        }
+        if ($InputData -is [string]) {
+            # Already an ID string in expected format
+            switch ($InputData) {
+                { $_ -like "Deployments-*" } {
+                    return $InputData
+                }
+                { $_ -like "Tasks-*" } {
+                    return $InputData
+                }
+                { $_ -like "Projects-*" } {
+                    return $InputData
+                }
+                { $_ -like "Environments-*" } {
+                    return $InputData
+                }
+                { $_ -like "Tenants-*" } {
+                    return $InputData
+                }
+                default { return $null }
+            }
+        }
+        return $null
     }
 }
