@@ -19,7 +19,7 @@ function Set-RunbookSettings {
         Specifies the description of the runbook.
     .PARAMETER EnvironmentScope
         Specifies the environment scope of the runbook. Valid values are 'All', 'FromProjectLifecycles', and 'Specified'.
-    .PARAMETER Envionments
+    .PARAMETER Environments
         Specifies the environments to which the runbook is scoped. This parameter is only used when EnvironmentScope is set to 'Specified'.
         If you want to set the EnvironmentScope to 'All' or 'FromProjectLifecycles', you can leave this parameter empty.
     .PARAMETER RetentionPolicy
