@@ -43,7 +43,7 @@ function Set-RunbookSettings {
             Position = 0,
             ValueFromPipeline = $true)]
         [ValidateNotNullOrEmpty()]
-        # [RunbookSingleTransformation()]
+        [RunbookSingleTransformation()]
         [Octopus.Client.Model.RunbookResource]
         $Runbook,
 
