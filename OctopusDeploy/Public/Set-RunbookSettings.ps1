@@ -16,11 +16,13 @@ function Set-RunbookSettings {
         Specifies the name of the runbook to set.
     .PARAMETER Description
         Specifies the description of the runbook.
-    .PARAMETER RunRetentionPolicy
-        Specifies the run retention policy of the runbook. Valid values are 0 (keep forever) and 1-10000 (number of runs to keep).
     .PARAMETER EnvironmentScope
         Specifies the environment scope of the runbook. Valid values are 'All', 'FromProjectLifecycles', and 'Specified'.
         The parameter EnvironmentScope 'Specified' requires to manage the Environments in Octopus Deploy UI.
+    .PARAMETER RetentionPolicy
+        Specifies the run retention policy of the runbook. Valid values are 0 (keep forever) and 1-10000 (number of runs to keep).
+    .PARAMETER RetentionUnit
+        Specifies the retention unit of the runbook. Valid values are 'Days' and 'Runs'.
     .PARAMETER MultiTenancyMode
         Specifies the multi-tenancy mode of the runbook. Valid values are 'Tenanted', 'TenantedOrUntenanted', and 'Untenanted'.
     .PARAMETER ForcePackageDownload
@@ -29,7 +31,7 @@ function Set-RunbookSettings {
         Set-RunbookSettings -Runbook 'RunbookName' -Description 'New Description' -RunRetentionPolicy 1000 -MultiTenancyMode 'Tenanted'
         Set-RunbookSettings -Runbook $runbookObj -EnvironmentScope 'Specified'
         Set-RunbookSettings -Runbook $runbookObj -EnvironmentScope 'All'
-        Set-RunbookSettings -Runbook $runbookObj -RetentionPolicy 1000
+        Set-RunbookSettings -Runbook $runbookObj -RetentionPolicy 100 -RetentionUnit 'Days'
         Set-RunbookSettings -Runbook $runbookObj -Name 'DBMS Mig - DNA-000 - Draftbook' -Description 'This is just a draft' -MultiTenancyMode 'Tenanted'
         Set-RunbookSettings -Runbook $runbookObj -ForcePackageDownload $true
     #>
@@ -41,7 +43,7 @@ function Set-RunbookSettings {
             Position = 0,
             ValueFromPipeline = $true)]
         [ValidateNotNullOrEmpty()]
-        [RunbookSingleTransformation()]
+        # [RunbookSingleTransformation()]
         [Octopus.Client.Model.RunbookResource]
         $Runbook,
 
@@ -59,15 +61,21 @@ function Set-RunbookSettings {
 
         [Parameter(mandatory = $false,
             ValueFromPipelineByPropertyName = $true)]
+        [ValidateSet('All', 'FromProjectLifecycles', 'Specified')]
+        [string]
+        $EnvironmentScope,
+
+        [Parameter(mandatory = $false,
+            ValueFromPipelineByPropertyName = $true)]
         [ValidateRange(0, 10000)]
         [int]
         $RetentionPolicy,
 
         [Parameter(mandatory = $false,
             ValueFromPipelineByPropertyName = $true)]
-        [ValidateSet('All', 'FromProjectLifecycles', 'Specified')]
+        [ValidateSet('Days', 'Runs')]
         [string]
-        $EnvironmentScope,
+        $RetentionUnit,
 
         [Parameter(mandatory = $false,
             ValueFromPipelineByPropertyName = $true)]
@@ -98,13 +106,21 @@ function Set-RunbookSettings {
         }
 
         if ($PSBoundParameters.ContainsKey("RetentionPolicy")) {
+            # Create a new RunRetentionPolicy-Object to avoid permission issues
+            $retentionPolicyObj = New-Object Octopus.Client.Model.RunbookRetentionPeriod
             if ($RetentionPolicy -eq 0) {
                 Write-Warning "Setting RetentionPolicy to 0 will keep runbooks forever. This is not recommended."
-                $Runbook.RunRetentionPolicy.ShouldKeepForever = $true
+                $retentionPolicyObj.ShouldKeepForever = $true
             } else {
-                $Runbook.RunRetentionPolicy.ShouldKeepForever = $false
+                $retentionPolicyObj.ShouldKeepForever = $false
             }
-            $Runbook.RunRetentionPolicy.QuantityToKeep = $RetentionPolicy
+            if ($RetentionUnit -eq 'Days') {
+                $retentionPolicyObj.Unit = 'Days'
+            } elseif ($RetentionUnit -eq 'Runs') {
+                $retentionPolicyObj.Unit = 'Items'
+            }
+            $retentionPolicyObj.QuantityToKeep = $RetentionPolicy
+            $Runbook.RunRetentionPolicy = $retentionPolicyObj
             $Runbook.RunRetentionPolicy
         }
 
