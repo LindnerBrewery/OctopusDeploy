@@ -4,6 +4,14 @@
         Set a common tenant variable
     .DESCRIPTION
         A longer description of the function, its purpose, common use cases, etc.
+    .PARAMETER Tenant
+        The tenant to modify.
+    .PARAMETER VariableSet
+        The variable set to modify.
+    .PARAMETER Name
+        The name of the variable to modify.
+    .PARAMETER Value
+        The new value for the variable.
     .NOTES
         Information or caveats about the function e.g. 'This function is not supported in Linux'
     .LINK
