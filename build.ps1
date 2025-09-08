@@ -22,7 +22,7 @@ $ErrorActionPreference = 'Stop'
 
 # Bootstrap dependencies
 if ($Bootstrap.IsPresent) {
-    Get-PackageProvider -Name Nuget -ForceBootstrap | Out-Null
+    Get-PackageProvider -Name Nuget -ForceBootstrap
     Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
     nuget locals all -clear
     if ((Test-Path -Path ./requirements.psd1)) {
