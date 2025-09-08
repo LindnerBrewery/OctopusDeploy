@@ -27,8 +27,9 @@
         Version = '1.19.1'
     }
     'Octopus.Client'      = @{
+        Version        = 'latest'
         DependencyType = 'Package'
-        Source         = 'nuget.org'
+        Source         = 'Nugetv2'
         Parameters     = @{
             SkipDependencies = $true
         }

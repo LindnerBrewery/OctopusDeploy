@@ -22,8 +22,10 @@ $ErrorActionPreference = 'Stop'
 
 # Bootstrap dependencies
 if ($Bootstrap.IsPresent) {
-    Get-PackageProvider -Name Nuget -ForceBootstrap | Out-Null
+    Get-PackageProvider -Name Nuget -ForceBootstrap
+    Register-PackageSource -Name Nugetv2 -Location 'https://www.nuget.org/api/v2' -ProviderName NuGet -Trusted -Force
     Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+
     if ((Test-Path -Path ./requirements.psd1)) {
         if (-not ((Get-Module -Name PowerShellBuild -ListAvailable).version -eq [version]'0.6.2')) {
             Install-Module -Name PowerShellBuild -Repository PSGallery -Scope CurrentUser -Force -RequiredVersion 0.6.2
@@ -34,7 +36,7 @@ if ($Bootstrap.IsPresent) {
             Install-Module -Name PSDepend -Repository PSGallery -Scope CurrentUser -Force
         }
         Import-Module -Name PSDepend -Verbose:$false
-        Invoke-PSDepend -Path './requirements.psd1' -Install -Import -Force -WarningAction SilentlyContinue
+        Invoke-PSDepend -Path './requirements.psd1' -Install -Import -Force -WarningAction SilentlyContinue -Verbose
 
         $octoClient = (Get-ChildItem $PSScriptRoot\dependencies\Octopus.Client.* | Sort-Object -Property @{e = { [version]$_.name.replace("Octopus.Client.", "") } } -Descending | Select-Object -First 1).fullname;
         Write-Host $octoClient
