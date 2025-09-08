@@ -25,7 +25,7 @@ if ($Bootstrap.IsPresent) {
     Get-PackageProvider -Name Nuget -ForceBootstrap
     Register-PackageSource -Name Nugetv2 -Location 'https://www.nuget.org/api/v2' -ProviderName NuGet -Trusted -Force
     Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-    nuget locals all -clear
+
     if ((Test-Path -Path ./requirements.psd1)) {
         if (-not ((Get-Module -Name PowerShellBuild -ListAvailable).version -eq [version]'0.6.2')) {
             Install-Module -Name PowerShellBuild -Repository PSGallery -Scope CurrentUser -Force -RequiredVersion 0.6.2
