@@ -19,6 +19,10 @@ jobs:
     - name: Test GitVersion
       shell: pwsh
       run: ls $pwd; dotnet-gitversion
+    - name: Clear NuGet cache
+      run: nuget locals all -clear
+    - name: Install Octopus.Client
+      run: Install-Package Octopus.Client
     - name: Test
       shell: pwsh
       run: ./build.ps1 -Task default -Bootstrap
