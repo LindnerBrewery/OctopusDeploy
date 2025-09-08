@@ -29,7 +29,7 @@
     'Octopus.Client'      = @{
         Version        = '17.2.2322'
         DependencyType = 'Package'
-        Source         = 'nuget.org'
+        Source         = 'https://www.nuget.org/api/v2'
         Parameters     = @{
             SkipDependencies = $true
         }
