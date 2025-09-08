@@ -27,6 +27,7 @@
         Version = '1.19.1'
     }
     'Octopus.Client'      = @{
+        Version = 'latest'
         DependencyType = 'Package'
         Source         = 'nuget.org'
         Parameters     = @{

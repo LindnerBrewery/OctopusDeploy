@@ -34,7 +34,7 @@ if ($Bootstrap.IsPresent) {
             Install-Module -Name PSDepend -Repository PSGallery -Scope CurrentUser -Force
         }
         Import-Module -Name PSDepend -Verbose:$false
-        Invoke-PSDepend -Path './requirements.psd1' -Install -Import -Force -WarningAction SilentlyContinue
+        Invoke-PSDepend -Path './requirements.psd1' -Install -Import -Force -WarningAction SilentlyContinue -Verbose
 
         $octoClient = (Get-ChildItem $PSScriptRoot\dependencies\Octopus.Client.* | Sort-Object -Property @{e = { [version]$_.name.replace("Octopus.Client.", "") } } -Descending | Select-Object -First 1).fullname;
         Write-Host $octoClient
