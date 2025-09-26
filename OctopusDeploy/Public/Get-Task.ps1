@@ -106,6 +106,10 @@
                 } else { return ($path + "&") }
             }
 
+            # always add space
+            $space = Get-CurrentSpace
+            $path = (checkpath $path) + "spaces=$($space.id)"
+
             # setting up searchlink
             if ($TaskType) { $path = (checkpath $path) + "name=$tasktype" }
             if ($Tenant) { $path = (checkpath $path) + "tenant=$($Tenant.id)" }
