@@ -104,6 +104,7 @@ function Stop-Task {
         Write-Verbose "Found $($tasksToCancel.Count) tasks to cancel."
 
         # Cancel each task
+        # Todo [DNA-327]: Add progress bar for large number of tasks to give user feedback
         foreach ($_task in $tasksToCancel) {
             try {
                 Write-Verbose "Cancelling task: $($_task.Id) - $($_task.Description)"
