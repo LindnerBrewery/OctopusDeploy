@@ -51,11 +51,7 @@
     - Requires an active connection to Octopus Deploy (use Connect-Octopus first)
     - For Configuration as Code projects, branch information is retrieved to determine runbook versions
     - Non-CaC projects will return runbooks regardless of the BranchName parameter
-    
-.LINK
-    Get-GitBranch
-    Connect-Octopus
-    Get-Project
+ 
 #>
     [CmdletBinding(DefaultParameterSetName = "default")]
     param (
