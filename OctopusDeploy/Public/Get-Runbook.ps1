@@ -23,23 +23,7 @@
             ParameterSetName = 'byName' )]
         [ProjectTransformation()]
         [Octopus.Client.Model.ProjectResource[]]
-        $Project,
-
-        [Parameter(mandatory = $true,
-            ValueFromPipelineByPropertyName = $false,
-            ValueFromPipeline = $false,
-            ParameterSetName = 'byName' )]
-        [AllowNull()]
-        [AllowEmptyString()]
-        [String]
-        $Name,
-
-        [Parameter(mandatory = $true,
-            ValueFromPipelineByPropertyName = $false,
-            ParameterSetName = 'byID' )]
-        [ValidateNotNullOrEmpty()]
-        [String]
-        $ID
+        $Project
 
 
 
@@ -56,20 +40,9 @@
     process {
 
         if ($PSCmdlet.ParameterSetName -eq 'default') {
+            $repo._repository.runbooks.findall()
+            Write-Warning "This return all non CaC runbooks. To get CaC runbooks add the project and optional branch."
             return $all
-        }
-        if ($PSCmdlet.ParameterSetName -eq 'byName') {
-            if ($Project) {
-                return $all | Where-Object {$_.name -like $Name -and $_.ProjectID -eq $Project.ID}
-            } else {
-                return $all | Where-Object name -like $Name
-            }
-        }
-        if ($PSCmdlet.ParameterSetName -eq 'byID') {
-            return $repo._repository.Runbooks.get($ID)
-        }
-        if ($PSCmdlet.ParameterSetName -eq 'byProject') {
-            return ($project | ForEach-Object {$all  | Where-Object ProjectID -EQ $_.ID})
         }
     }
     end {}
