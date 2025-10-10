@@ -89,7 +89,7 @@
             $result = $result | Where-Object HealthStatus -In  @('Healthy', 'HasWarnings')
         }
         if ($Environment) {
-            $result = $result | Where-Object EnvironmentIDs -In $Environment.Id
+            $result = $result | Where-Object {$Environment.id -in $_.EnvironmentIds}
         }
         if ($Role) {
             $result = $result | Where-Object { (Compare-Object -ReferenceObject ([system.collections.Generic.List[String]]@($_.Roles)) -DifferenceObject $Role -ExcludeDifferent) }
