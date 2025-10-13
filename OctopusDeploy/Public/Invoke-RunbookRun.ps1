@@ -82,10 +82,6 @@
     - The BranchName parameter is only applicable to CaC projects and will be ignored for traditional projects
     - Tenant support depends on the project's TenantedDeploymentMode setting (Tenanted, Untenanted, or TenantedOrUntenanted)
 
-.LINK
-    Get-Runbook
-    Get-GitBranch
-    Get-Project
 #>
     [CmdletBinding(DefaultParameterSetName = 'default',
         SupportsShouldProcess = $true,
