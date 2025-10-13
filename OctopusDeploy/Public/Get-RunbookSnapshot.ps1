@@ -5,7 +5,7 @@
 .DESCRIPTION
     Returns a runbook snapshot. A snapshot is the runbook equivalent to releases. It can be used to find runs or artifacts
 .EXAMPLE
-    PS C:\> Get-Runbook -Project 'Install RS' -Name "Check Config - Max Memory" | Get-RunbookSnapshot -latest
+    PS C:\> Get-Runbook -Project 'Install RS' | Where-Object name -EQ  "Check Config - Max Memory" | Get-RunbookSnapshot -latest
     Returns the latest snapshot of the runbook. This is not necessarily the puplished snapshot
 .EXAMPLE
     PS C:\> Get-RunbookSnapshot -Runbook "Predeploy - Default" -Published

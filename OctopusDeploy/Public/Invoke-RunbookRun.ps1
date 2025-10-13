@@ -14,11 +14,14 @@
 
 .PARAMETER Runbook
     The runbook to run. Can be a RunbookResource object or a string that will be transformed to a RunbookResource.
-    If only the Runbook parameter is provided (without RunbookSnapshot), the function will use the published snapshot for traditional projects,
-    or run from Git for CaC projects.
+    This parameter is used for Configuration as Code (CaC) projects. When specified, the runbook will be run directly 
+    from a Git branch. If no BranchName is provided, the project's default branch will be used automatically.
+    This parameter is mandatory when using the 'Runbook' parameter set.
 
 .PARAMETER RunbookSnapshot
-    The runbook snapshot to run for traditional (non-CaC) projects. Only applicable to non-CaC projects.
+    The runbook snapshot to run for traditional (non-CaC) projects. This parameter is used to run a published 
+    snapshot of a runbook from projects that do not use Configuration as Code. This parameter is mandatory 
+    when using the 'Snapshot' parameter set.
 
 .PARAMETER BranchName
     Optional. The Git branch name to use for Configuration as Code projects. Can be either:
@@ -29,19 +32,23 @@
     This parameter is ignored for traditional (non-CaC) projects.
 
 .PARAMETER Tenant
-    Optional. One or more tenants for which to run the runbook. Only valid if the project supports tenanted deployments.
+    Optional. One or more tenants for which to run the runbook. Only valid if the project's TenantedDeploymentMode 
+    is set to 'Tenanted' or 'TenantedOrUntenanted'. Each tenant will be validated to ensure it is connected to the 
+    specified project and environment before execution.
 
 .PARAMETER Environment
-    Required. The environment in which to run the runbook.
+    Required. The environment in which to run the runbook. Must be a valid environment in the current Octopus space.
 
 .PARAMETER QueueTime
     Optional. Schedule the runbook run to start at a specific date and time.
 
 .PARAMETER ExpiryInMin
-    Optional. Number of minutes until the scheduled run expires. Default is 60 minutes.
+    Optional. Number of minutes until the scheduled run expires. Default is 60 minutes. Only applicable when 
+    QueueTime is specified.
 
 .PARAMETER FormValue
-    Optional. A hashtable of form values (variables) to pass to the runbook. Key is the variable ID, value is the variable value.
+    Optional. A hashtable of form values (prompted variables) to pass to the runbook. The key should be the 
+    variable name or ID, and the value is the variable value to use during the runbook run.
 
 .PARAMETER Force
     Optional. Bypass confirmation prompts.
@@ -67,23 +74,32 @@
     Runs a traditional runbook snapshot for a specific tenant in the Production environment.
 
 .EXAMPLE
-    PS C:\> Invoke-RunbookRun -Runbook "TestRunbook" -Environment Production
+    PS C:\> Invoke-RunbookRun -RunbookSnapshot (Get-RunbookSnapshot -Runbook "Maintenance" -Latest) -Environment Test
     
-    Runs the published runbook snapshot (for traditional projects) or uses default branch (for CaC projects) in the Production environment.
+    Runs the latest published runbook snapshot (for traditional projects) in the Test environment, untenanted.
 
 .EXAMPLE
-    PS C:\> Invoke-RunbookRun -Runbook "MaintenanceRunbook" -Tenant XXROM001, XXROM002 -Environment Production -FormValue @{'TestVar' = 'value'}
+    PS C:\> Invoke-RunbookRun -Runbook "MaintenanceRunbook" -Tenant XXROM001, XXROM002 -Environment Production -FormValue @{'VariableName' = 'value'}
     
-    Runs a runbook for multiple tenants and sets a variable value.
+    Runs a CaC runbook for multiple tenants and sets a prompted variable value.
+
+.EXAMPLE
+    PS C:\> Invoke-RunbookRun -Runbook "ScheduledTask" -Environment Production -QueueTime (Get-Date).AddHours(2) -ExpiryInMin 120
+    
+    Schedules a CaC runbook to run in 2 hours with an expiry time of 120 minutes.
 
 .NOTES
-    - The function automatically detects if a project uses Configuration as Code (CaC) by checking the project's IsVersionControlled property
-    - For CaC projects, if no BranchName is specified, the project's default branch is used (identified via Get-GitBranch)
+    - Requires an active connection to Octopus Deploy (use Connect-Octopus first)
+    - The function uses parameter sets to distinguish between CaC runbooks (Runbook parameter) and traditional snapshots (RunbookSnapshot parameter)
+    - For CaC projects, if no BranchName is specified, the project's default branch is used automatically
     - The BranchName parameter is only applicable to CaC projects and will be ignored for traditional projects
     - Tenant support depends on the project's TenantedDeploymentMode setting (Tenanted, Untenanted, or TenantedOrUntenanted)
+    - When using the Runbook parameter, the project must be a Configuration as Code project
+    - When using the RunbookSnapshot parameter, the project must be a traditional (non-CaC) project
+    - The Force parameter bypasses the confirmation prompt (ConfirmImpact is set to 'High')
 
 #>
-    [CmdletBinding(DefaultParameterSetName = 'default',
+    [CmdletBinding(DefaultParameterSetName = 'Runbook',
         SupportsShouldProcess = $true,
         PositionalBinding = $false,
         HelpUri = 'http://www.google.com/',
@@ -92,7 +108,7 @@
         # If only runbook is provided then the published snapshot should be used
         # Parameter help description
         [Parameter(Mandatory = $true,
-            ParameterSetName = 'RunbookPublished')]
+            ParameterSetName = 'Runbook')]
         [RunbookSingleTransformation()]
         [Octopus.Client.Model.RunbookResource]
         $Runbook,
@@ -105,7 +121,7 @@
 
         # Git branch name for Configuration as Code runbooks (optional - defaults to project default branch)
         [Parameter(Mandatory = $false,
-            ParameterSetName = 'RunbookPublished')]
+            ParameterSetName = 'Runbook')]
         [String]
         $BranchName,
 
@@ -148,52 +164,126 @@
     }
 
     process {
-        # Get runbook and project resources
-        if (!$runbook -and !$PSBoundParameters.confirm) {
-            $runbook = Get-Runbook -ID $runbookSnapshot.RunbookId
+        if ($PSCmdlet.ParameterSetName -eq 'snapshot') {
+            $Runbook = Get-Runbook -ID $RunbookSnapshot.RunbookId -ErrorAction Stop
+            $project = Get-Project -ID $runbookSnapshot.ProjectId -ErrorAction Stop
         }
-        
-        # Get project resource
-        if ($runbookSnapshot) {
-            $project = Get-Project -ID $runbookSnapshot.ProjectId
+
+        if ($PSCmdlet.ParameterSetName -eq 'Runbook') {
+            $project = Get-Project -ID $Runbook.ProjectId -ErrorAction Stop
+
+            # There is an edge case where the project id CaC but the runbook is not
+            # this is the case when the runbook has not Link
+            if ($project.isVersionControlled -and $Runbook.Links.count -gt 0) {
+                Write-Verbose "Runbook '$($Runbook.Name)' is a Configuration as Code runbook."
+            }
+            elseif (-not $project.isVersionControlled) {
+                Write-Verbose "Project '$($project.name)' is not a Configuration as Code project. Use the RunbookSnapshot parameter to run a traditional runbook snapshot."
+                $message = "'{0}' is not a Configuration as Code project. Use the RunbookSnapshot parameter to run a traditional runbook snapshot." -f $project.name
+                $myError = Get-CustomError -Message $message -Category InvalidData -Exception System.ArgumentException
+                $PSCmdlet.WriteError($myError)
+                return
+            }
+            else {
+                Write-Verbose "Runbook '$($Runbook.Name)' is not a Configuration as Code runbook. Use the RunbookSnapshot parameter to run a traditional runbook snapshot."
+                $message = "'{0}' is not a Configuration as Code runbook. Use the RunbookSnapshot parameter to run a traditional runbook snapshot." -f $Runbook.Name
+                $myError = Get-CustomError -Message $message -Category InvalidData -Exception System.ArgumentException
+                $PSCmdlet.WriteError($myError)
+                return
+            }
         }
-        else {
-            $project = Get-Project -ID $runbook.ProjectId
-        }
-        
-        # Determine if this is a CaC project
-        $isCaCProject = $project.IsVersionControlled
         
         # Validate tenant mode
         if ($Tenant) {
             # check if project supports tenanted deployments
             if ($project.TenantedDeploymentMode -eq 'Untenanted') {
                 $message = "'{0}' does not support tenanted deployments" -f $project.name
-                try {
-                    throw $message
-                }
-                catch {
-                    $PSCmdlet.ThrowTerminatingError($_)
-                }
+                $myError = Get-CustomError -Message $message -Category InvalidData -Exception System.ArgumentException
+                $PSCmdlet.WriteError($myError)
+                return
             }
         }
         else {
             # check if project supports untenanted deployments
             if ($project.TenantedDeploymentMode -eq 'Tenanted') {
                 $message = "'{0}' does not support untenanted deployments" -f $project.name
-                try {
-                    throw $message
+                $myError = Get-CustomError -Message $message -Category InvalidData -Exception System.ArgumentException
+                $PSCmdlet.WriteError($myError)
+                return
+            }
+        }
+    
+        if ($PSCmdlet.ParameterSetName -eq 'snapshot') {
+            # Traditional Project Path - use snapshot-based execution
+            Write-Verbose "Project '$($project.name)' uses traditional runbook snapshots"
+            
+            # Prepare ShouldProcess messages
+            $shouldMessage1 = "Run runbook snapshot '{0}' in environment '{1}'" -f $runbookSnapshot.Name, $environment.Name
+            $shouldMessage2 = "Run {0}/{1}" -f $project.Name, $runbook.Name
+            
+            if ($force -or $PSCmdlet.ShouldProcess($shouldMessage1, $shouldMessage2)) {
+                
+                # Create a new runbook run object
+                $runbookRun = [Octopus.Client.Model.RunbookRunResource]::new()
+                $runbookRun.EnvironmentId = $environment.Id
+                $runbookRun.ProjectId = $RunbookSnapshot.ProjectId
+                $runbookRun.RunbookSnapshotId = $RunbookSnapshot.ID
+                $runbookRun.RunbookId = $RunbookSnapshot.RunbookId
+                
+                if ($QueueTime) {
+                    $runbookRun.QueueTime = $QueueTime
+                    $runbookRun.QueueTimeExpiry = $QueueTime.AddMinutes($ExpiryInMin)
                 }
-                catch {
-                    $PSCmdlet.ThrowTerminatingError($_)
+                
+                # Add variables to runbook run if passed in
+                if ($FormValue) {
+                    foreach ($key in $FormValue.keys) {
+                        $runbookRun.FormValues.Add($key, $FormValue[$key])
+                    }
+                }
+                
+                if ($Tenant) {
+                    # Run tenanted runbook for each tenant
+                    foreach ($_tenant in $Tenant) {
+                        # Validate tenant is connected to project environment
+                        if (! ($_tenant.ProjectEnvironments[$Project.id] -contains $Environment.Id)) {
+                            $message = "'{0}' is not connected to '{1}' in '{2}'" -f $_tenant.name, $Project.name, $Environment.name
+                            try {
+                                throw $message
+                            }
+                            catch {
+                                $PSCmdlet.WriteError($_)
+                                continue
+                            }
+                        }
+                        
+                        $runbookRun.TenantId = $_tenant.id
+                        try {
+                            Write-Verbose "Running traditional runbook snapshot for tenant '$($_tenant.Name)'"
+                            return $repo._repository.RunbookRuns.Create($runbookRun)
+                        }
+                        catch {
+                            $PSCmdlet.WriteError($_)
+                        }
+                    }
+                }
+                else {
+                    # Execute runbook without tenant
+                    try {
+                        Write-Verbose "Running traditional runbook snapshot (untenanted)"
+                        return $repo._repository.RunbookRuns.Create($runbookRun)
+                    }
+                    catch {
+                        $PSCmdlet.WriteError($_)
+                    }
                 }
             }
         }
-        
+      
+
         # Branch logic based on project type
-        if ($isCaCProject -and !$runbookSnapshot) {
-            # CaC Project Path - use Git-based execution
-            Write-Verbose "Project '$($project.name)' is a Configuration as Code project"
+        if ($PSCmdlet.ParameterSetName -eq 'Runbook') {
+          
             
             # Resolve Git branch
             $branches = Get-GitBranch -Project $Project
@@ -307,87 +397,7 @@
             }
         }
         else {
-            # Traditional Project Path - use snapshot-based execution
-            Write-Verbose "Project '$($project.name)' uses traditional runbook snapshots"
             
-            if ($BranchName) {
-                Write-Warning "BranchName parameter is only applicable to Configuration as Code projects. It will be ignored."
-            }
-            
-            if (! $runbookSnapshot) {
-                if ($null -eq $runbook.PublishedRunbookSnapshotId) {
-                    $message = "'{0}/{1}' hasn't got a published snapshot" -f $project.name , $runbook.name
-                    try {
-                        throw $message
-                    }
-                    catch {
-                        $PSCmdlet.ThrowTerminatingError($_)
-                    }
-                }
-                $runbookSnapshot = Get-RunbookSnapshot -ID $runbook.PublishedRunbookSnapshotId
-            }
-            
-            # Prepare ShouldProcess messages
-            $shouldMessage1 = "Run runbook snapshot '{0}' in environment '{1}'" -f $runbookSnapshot.Name, $environment.Name
-            $shouldMessage2 = "Run {0}/{1}" -f $project.Name, $runbook.Name
-            
-            if ($force -or $PSCmdlet.ShouldProcess($shouldMessage1, $shouldMessage2)) {
-                
-                # Create a new runbook run object
-                $runbookRun = [Octopus.Client.Model.RunbookRunResource]::new()
-                $runbookRun.EnvironmentId = $environment.Id
-                $runbookRun.ProjectId = $RunbookSnapshot.ProjectId
-                $runbookRun.RunbookSnapshotId = $RunbookSnapshot.ID
-                $runbookRun.RunbookId = $RunbookSnapshot.RunbookId
-                
-                if ($QueueTime) {
-                    $runbookRun.QueueTime = $QueueTime
-                    $runbookRun.QueueTimeExpiry = $QueueTime.AddMinutes($ExpiryInMin)
-                }
-                
-                # Add variables to runbook run if passed in
-                if ($FormValue) {
-                    foreach ($key in $FormValue.keys) {
-                        $runbookRun.FormValues.Add($key, $FormValue[$key])
-                    }
-                }
-                
-                if ($Tenant) {
-                    # Run tenanted runbook for each tenant
-                    foreach ($_tenant in $Tenant) {
-                        # Validate tenant is connected to project environment
-                        if (! ($_tenant.ProjectEnvironments[$Project.id] -contains $Environment.Id)) {
-                            $message = "'{0}' is not connected to '{1}' in '{2}'" -f $_tenant.name, $Project.name, $Environment.name
-                            try {
-                                throw $message
-                            }
-                            catch {
-                                $PSCmdlet.WriteError($_)
-                                continue
-                            }
-                        }
-                        
-                        $runbookRun.TenantId = $_tenant.id
-                        try {
-                            Write-Verbose "Running traditional runbook snapshot for tenant '$($_tenant.Name)'"
-                            $repo._repository.RunbookRuns.Create($runbookRun)
-                        }
-                        catch {
-                            $PSCmdlet.WriteError($_)
-                        }
-                    }
-                }
-                else {
-                    # Execute runbook without tenant
-                    try {
-                        Write-Verbose "Running traditional runbook snapshot (untenanted)"
-                        $repo._repository.RunbookRuns.Create($runbookRun)
-                    }
-                    catch {
-                        $PSCmdlet.WriteError($_)
-                    }
-                }
-            }
         }
     }
 
