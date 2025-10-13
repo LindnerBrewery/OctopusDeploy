@@ -80,6 +80,6 @@ jobs:
         files: |
           OctopusDeploy-${{ steps.gitversion.outputs.semVer }}.zip
         draft: false
-        prerelease: ${{ steps.gitversion.outputs.preReleaseTag != '' }}
+        prerelease: false  # For mainline/main branch, never mark as prerelease
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
