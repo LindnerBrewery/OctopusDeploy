@@ -371,10 +371,6 @@ Get-SourceScriptsInGit -Project "My CaC Project"
 
 Contributions are welcome! This module is developed "as is" and functions are added as needed. Please note that breaking changes may occur in future versions.
 
-## � Special Thanks
-
-Special thanks to **Marvin Becker** for his valuable contributions to this project. His work has helped improve and extend the functionality of this module.
-
 ## �📄 License
 
 Copyright (c) 2025 Emrys MacInally. All rights reserved.
