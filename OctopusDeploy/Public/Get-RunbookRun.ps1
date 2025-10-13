@@ -16,9 +16,6 @@
     .EXAMPLE
     PS C:\> Get-RunbookSnapshot -Runbook "Predeploy - Default" -Published | Get-RunbookRun
     returns all runs of the currently published runbook snapshot. Beware: Runbook names are not unique. Add the project to be sure to only get a unique snapshot.
-
-.LINK
-    Specify a URI to a help page, this will show when Get-Help -Online is used.
 #>
     [CmdletBinding(DefaultParameterSetName = "default")]
     param (
