@@ -105,4 +105,4 @@
     end {}
 
 }
-#Get-CommonTenantVariable -Tenant XXROM001 -VariableSet "customer variables"
+
