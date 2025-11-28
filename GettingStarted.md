@@ -789,6 +789,12 @@ These are library variables with tenant-specific values:
 # Get common tenant variables
 Get-CommonTenantVariable -VariableSet "Customer Variables" -Tenant "MyTenant"
 
+# Get common tenant variables for a specific environment
+Get-CommonTenantVariable -Tenant "MyTenant" -Environment "Production"
+
+# Get all common tenant variables (across all variable sets)
+Get-CommonTenantVariable -Tenant "MyTenant"
+
 # Set a single variable
 Set-CommonTenantVariable -Tenant "MyTenant" -VariableSet "Customer Variables" -Name "DatabaseServer" -Value "sql.example.com"
 

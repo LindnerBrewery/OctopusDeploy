@@ -93,7 +93,7 @@
         catch {
             $PSCmdlet.ThrowTerminatingError($_)
         }
-     }
+    }
     process {
         if ($PSCmdlet.ParameterSetName -eq 'ByID') {
             $repo._repository.Tasks.Get($TaskID)
@@ -103,7 +103,8 @@
             function checkpath ($path) {
                 if ($path -eq '/api/tasks') {
                     return '/api/tasks?'
-                } else { return ($path + "&") }
+                }
+                else { return ($path + "&") }
             }
 
             # always add space
@@ -148,9 +149,10 @@
                 }
                 return $results.Items
 
-            } catch {
+            }
+            catch {
 
-                Throw $_
+                throw $_
             }
 
 
@@ -161,9 +163,11 @@
             foreach ($r in $Regarding) {
                 if ($r -is [Octopus.Client.Model.RunbookSnapshotResource]) {
                     $tasks = (Get-RunbookRun -RunbookSnapshot $r).links.task
-                } elseif ($r -is [Octopus.Client.Model.ReleaseResource]) {
+                }
+                elseif ($r -is [Octopus.Client.Model.ReleaseResource]) {
                     $tasks = (Get-Deployment -Release $r).links.task
-                } elseif ($r -is [Octopus.Client.Model.DeploymentResource]) {
+                }
+                elseif ($r -is [Octopus.Client.Model.DeploymentResource]) {
                     $tasks = @($r.TaskId)
                 }
                 foreach ($t in $tasks) {

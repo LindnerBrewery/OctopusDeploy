@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Improved
+- **Get-Task**: Added support for retrieving tasks from `DeploymentResource` objects.
+- **Get-CommonTenantVariable**: Added support for filtering by Environment, made VariableSet optional to retrieve all variable sets, and improved output to include scope and variable set name.
+
 ## [2.0.0] 
 
 ### Added - Configuration as Code Runbook Support 🎉
