@@ -163,6 +163,8 @@
                     $tasks = (Get-RunbookRun -RunbookSnapshot $r).links.task
                 } elseif ($r -is [Octopus.Client.Model.ReleaseResource]) {
                     $tasks = (Get-Deployment -Release $r).links.task
+                } elseif ($r -is [Octopus.Client.Model.DeploymentResource]) {
+                    $tasks = @($r.TaskId)
                 }
                 foreach ($t in $tasks) {
                     $repo._repository.Tasks.get((($t -split '/')[-1]))
