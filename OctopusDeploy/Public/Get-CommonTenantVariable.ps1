@@ -91,7 +91,7 @@
             }
             # if an environment was specified, return all scoped variables for that environment and unscoped variables a far the variable has no environment scope
             if ($PSBoundParameters['Environment']) {
-                $results = $results | Where-Object { ($_.Scope -contains $Environment.Name) -or ($null -eq $_.Scope -and ($results | Where-Object Name -EQ $_.name).count -eq 1) }  
+                [System.Array]$results = $results | Where-Object { ($_.Scope -contains $Environment.Name) -or ($null -eq $_.Scope -and ($results | Where-Object Name -EQ $_.name).count -eq 1) }  
             }
             
   
