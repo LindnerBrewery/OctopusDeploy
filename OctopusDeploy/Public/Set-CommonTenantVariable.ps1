@@ -66,39 +66,137 @@
             ParameterSetName = 'Hash')]
         [parameter(Mandatory = $false,
             ParameterSetName = 'Value')]
-        [string[]]$Environment = @()
+        [EnvironmentTransformation()]
+        [Octopus.Client.Model.EnvironmentResource[]]$Environment
     )
+    
     begin {
         # testing connection to octopus
         try {
             ValidateConnection
-        } catch {
+        }
+        catch {
             $PSCmdlet.ThrowTerminatingError($_)
         }
 
-        # Function to compare environment scopes
-        # function Test-ScopeMatch($scope1, $scope2) {
-        #     $env1 = @($scope1.EnvironmentIds | Sort-Object)
-        #     $env2 = @($scope2.EnvironmentIds | Sort-Object)
-    
-        #     if ($env1.Count -ne $env2.Count) { return $false }
-    
-        #     for ($i = 0; $i -lt $env1.Count; $i++) {
-        #         if ($env1[$i] -ne $env2[$i]) { return $false }
-        #     }
-    
-        #     return $true
-        # }
     }
     process {
         try {
-            # Fix the parameter set name comparison (case sensitive)
+            # Create the variable hash if using Name/Value parameters
             if ($PSCmdlet.ParameterSetName -eq "Value") {
                 $VariableHash = @{}
                 $VariableHash[$Name] = $Value
             }
-            Write-Verbose "Processing variables: $($VariableHash | ConvertTo-Json -Compress)"
             
+            if ($PSBoundParameters['Environment']) {
+                $envString = $Environment.name -join ', ' 
+            }
+            Write-Verbose "Processing variables: $($VariableHash | ConvertTo-Json -Compress) $envString"
+            ###################################################################################
+            # new implementation
+            $getCommonTenantVariableSpat = @{
+                Tenant      = $Tenant
+                VariableSet = $VariableSet
+            }
+            
+            $currentVariables = GetCommonTenantVariable @getCommonTenantVariableSpat
+
+
+            # Check that all the variables are defined in Variable Set
+            foreach ($h in $VariableHash.GetEnumerator()) {
+                if ($currentVariables.Name -notcontains $h.Name) {
+                    $message = "Couldn't find {0} in variable set {1}" -f $h.Name, $VariableSet.Name
+                    $err = [System.Management.Automation.ErrorRecord]::new(
+                        [System.Management.Automation.ItemNotFoundException]::new("$message"),
+                        'NotSpecified',
+                        'InvalidData',
+                        "$($Variableset.name) / $($h.name)"
+                    )
+                    $errorDetails = [System.Management.Automation.ErrorDetails]::new("$message")
+                    $errorDetails.RecommendedAction = "Check variable exists in variable set"
+                    $err.ErrorDetails = $errorDetails
+                    $PSCmdlet.ThrowTerminatingError($err)
+                }
+                else {
+                    $message = "Found variable {0} in variable set {1}" -f $h.Name, $VariableSet.Name
+                    Write-Verbose $message
+                }
+            }
+            # Create the target scope we want to match
+            $targetEnvIds = [Octopus.Client.Model.ReferenceCollection]::new($Environment.id)
+            $targetScope = [Octopus.Client.Model.TenantVariables.CommonVariableScope]::new($targetEnvIds)
+
+
+            # Create payloads for all variables
+            $payloads = @()
+            foreach ($existingVar in $currentVariables ) {
+                # Get the variable template
+                $varTemplate = Get-VariableTemplate -VariableSet $VariableSet -Name $existingVar.Name
+
+                # Determine if this variable is one we want to update and if both are scoped
+                if ($targetScope.EnvironmentIds.count -and $existingVar.Scope -and $VariableHash.Keys -contains $existingVar.Name) {
+                    Write-Host "Existing scope env Ids: $($existingVar.ScopeIds -join ',')"
+                    Write-Host "Target scope env Ids: $($targetScope.EnvironmentIds -join ',')"
+                    $comparison = Compare-EnvironmentScope -ExistingScope $existingVar.ScopeIds -NewScope $Environment.id
+                    $comparison | Out-String
+                    # update old variable and new variable depending on comparison result
+                    if ($comparison.Status -eq 'Disjoint'){
+                        'keeping old variable as-is and adding new variable with updated value and target scope'
+                    }elseif ($comparison.Status -in 'Equal', 'Contained') {
+                        'updating existing variable with new value'
+                    }elseif ($comparison.Status -eq 'Overlap') {
+                        'updating existing variable to remove overlapping scope and adding new variable with updated value and target scope'
+                    }else {
+                        throw "Unhandled comparison status: $($comparison.Status)"
+                    }
+
+                }
+                elseif ($VariableHash.Keys -contains $existingVar.Name -and -not $existingVar.Scope -and $targetScope.EnvironmentIds.count -eq 0) {
+                    "old value for {0} : {1}" -f $existingVar.Name, ($existingVar.Value)
+                    "new value for {0} : {1}" -f $existingVar.Name, $VariableHash[$existingVar.Name]
+                    "IsDefault {0}" -f $existingVar.IsDefaultValue
+                    
+                    # add old variable with updated value to payloads or create new variable if IsDefaultValue
+                    $variableId = if (-not $existingVar.IsDefaultValue) { $existingVar.VariableId } else { $null }
+                    
+                    $newTenantCommonVariablePayloadSpat = @{
+                        LibraryVariableSetId = $existingVar.LibraryVariableSetId
+                        TemplateId           = $existingVar.TemplateId
+                        Value                = $VariableHash[$existingVar.Name]
+                        Scope                = $targetScope
+                        VariableId           = $variableId
+                    }
+                    $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
+                        
+                    $payloads += $payload
+
+                }
+                else {
+                    # add old variable as-is to payloads
+                    "Preserving variable {0} as-is with scope {1}" -f $existingVar.Name, ($existingVar.Scope -join ',')
+                    #Todo: check if sensitive ....
+                    $newTenantCommonVariablePayloadSpat = @{
+                        LibraryVariableSetId = $existingVar.LibraryVariableSetId
+                        TemplateId           = $existingVar.TemplateId
+                        Value                = $existingVar.Value
+                        Scope                = $existingVar.Scope
+                        VariableId           = $existingVar.VariableId
+                    }
+                    $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
+                        
+                    $payloads += $payload
+                }
+            }
+            $payloads
+            exit
+
+
+
+            
+
+            ###################################################################################
+            # old implementation
+            ###################################################################################
             # Get variable set resource
             # $VariableSet = $repo._repository.LibraryVariableSets.FindByName($VariableSet)
 
@@ -111,11 +209,14 @@
                 if ($VariableSet.Templates.name -notcontains $h.Name) {
                     $message = "Couldn't find {0} in variable set {1}" -f $h.Name, $VariableSet.Name
                     throw $message
-                } else {
+                }
+                else {
                     $message = "Found variable {0} in variable set {1}" -f $h.Name, $VariableSet.Name
                     Write-Verbose $message
                 }
             }
+
+            #
 
             # Create the target scope we want to match (move outside the loop)
             $targetEnvIds = [Octopus.Client.Model.ReferenceCollection]::new()
@@ -176,7 +277,8 @@
                 if ($targetVariable) {
                     $payload.Id = $targetVariable.Id
                     $action = "updated ID: $($targetVariable.Id)"
-                } else {
+                }
+                else {
                     $payload.Id = [string]::Empty
                     $action = "created new"
                 }
@@ -191,7 +293,8 @@
             $command = [Octopus.Client.Model.TenantVariables.ModifyCommonVariablesByTenantIdCommand]::new($Tenant.Id, $Tenant.SpaceId, $payloads)
             $repo._repository.TenantVariables.Modify($command) | Out-Null
 
-        } catch {
+        }
+        catch {
             $PSCmdlet.ThrowTerminatingError($_)
         }
     }
