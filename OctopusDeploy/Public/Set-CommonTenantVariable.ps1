@@ -258,17 +258,17 @@
                        
                         $payloads += $payload
                         
-                        # add new variable with updated value and target scope
-                        $newTenantCommonVariablePayloadSpat = @{
-                            LibraryVariableSetId = $var.LibraryVariableSetId
-                            TemplateId           = $var.TemplateId
-                            Value                = $VariableHash[$var.Name]
-                            IsSensitive          = $var.IsSensitive
-                            Scope                = $comparison.NewScope
-                        }
-                        $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
-                        $payloads += $payload
-                        $newVariable | Where-Object { $_.Name -eq $var.Name } | ForEach-Object { $_.Added = $true }
+                        # # add new variable with updated value and target scope
+                        # $newTenantCommonVariablePayloadSpat = @{
+                        #     LibraryVariableSetId = $var.LibraryVariableSetId
+                        #     TemplateId           = $var.TemplateId
+                        #     Value                = $VariableHash[$var.Name]
+                        #     IsSensitive          = $var.IsSensitive
+                        #     Scope                = $comparison.NewScope
+                        # }
+                        # $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
+                        # $payloads += $payload
+                        # $newVariable | Where-Object { $_.Name -eq $var.Name } | ForEach-Object { $_.Added = $true }
                     }
                     elseif ($comparison.Status -in 'Equal', 'Contained') {
                         Write-Verbose 'Updating existing variable with new value'
@@ -335,7 +335,7 @@
                 $payloads += $payload
             }
 
-            $payloads
+            
             # Execute update using new API with all variables - any excluded variables are deleted
             $command = [Octopus.Client.Model.TenantVariables.ModifyCommonVariablesByTenantIdCommand]::new($Tenant.Id, $Tenant.SpaceId, $payloads)
             $repo._repository.TenantVariables.Modify($command) | Out-Null
