@@ -3,7 +3,7 @@
         [AllowNull()]
         [AllowEmptyCollection()]
         [string[]]$ExistingScope,
-                            
+
         # allow empty for new scope to represent unscoped
         [AllowNull()]
         [AllowEmptyCollection()]
@@ -19,7 +19,7 @@
 
     $intersection = $existing | Where-Object { $new -contains $_ }
     $remaining = $existing | Where-Object { $new -notcontains $_ }
-                        
+
     # No overlap
     if (-not $intersection) {
         return [pscustomobject]@{ Status = 'Disjoint'; ExistingScope = $existing; NewScope = $new }

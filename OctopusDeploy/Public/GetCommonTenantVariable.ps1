@@ -46,6 +46,7 @@
                         VariableSetName = $vSet.Name
                         Name            = $_.name
                         Value           = $_.DefaultValue.value
+                        ValueObject     = $_.DefaultValue
                         IsDefaultValue  = $true
                         Scope           = $null
                         ScopeIds        = $null
@@ -53,6 +54,7 @@
                         IsSensitive     = $_.DefaultValue.IsSensitive
                         VariableId      = $null
                         LibraryVariableSetId = $vSet.Id
+                        origObject     = $_
                     }
                 }  
             }
@@ -68,6 +70,7 @@
                     VariableSetName = $vSet.Name
                     Name            = $_.template.name
                     Value           = $_.value.value
+                    ValueObject   = $_.value
                     IsDefaultValue  = $false
                     Scope           = [String[]]($_.scope.EnvironmentIds | ForEach-Object { $environments | Where-Object id -Like $_ }).name
                     ScopeIds        = [String[]]($_.scope.EnvironmentIds)
@@ -75,6 +78,8 @@
                     IsSensitive     = $_.Value.IsSensitive
                     VariableId      = $_.Id
                     LibraryVariableSetId = $_.LibraryVariableSetId
+                    origObject     = $_
+                    
                 }
             }
             # if an environment was specified, return all scoped variables for that environment and unscoped variables a far the variable has no environment scope

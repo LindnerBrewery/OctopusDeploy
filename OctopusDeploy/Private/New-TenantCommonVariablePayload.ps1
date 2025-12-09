@@ -26,6 +26,9 @@
         [Parameter(Mandatory = $true)]
         $Value,
 
+        [Parameter(Mandatory = $false)]
+        [bool]$IsSensitive = $false,
+
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
         [AllowNull()]
@@ -38,7 +41,7 @@
     process {
         # Handle Value
         if ($Value -isnot [Octopus.Client.Model.PropertyValueResource]) {
-            $Value = [Octopus.Client.Model.PropertyValueResource]::new($Value, $false)
+            $Value = [Octopus.Client.Model.PropertyValueResource]::new($Value, $IsSensitive)
         }
 
         # Handle Scope
@@ -47,7 +50,10 @@
                 $Scope = [Octopus.Client.Model.TenantVariables.CommonVariableScope]::new($Scope)
             }
             elseif ($Scope -is [System.Collections.IEnumerable] -and $Scope -isnot [string]) {
-                $collection = [Octopus.Client.Model.ReferenceCollection]::new($Scope)
+                $collection = [Octopus.Client.Model.ReferenceCollection]::new()
+                foreach ($id in $Scope) {
+                    $collection.Add($id) | Out-Null
+                }
                 $Scope = [Octopus.Client.Model.TenantVariables.CommonVariableScope]::new($collection)
             }
             else {
