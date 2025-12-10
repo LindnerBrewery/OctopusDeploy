@@ -138,14 +138,14 @@
             # Variable to preserve (not being updated)
             $variableToPreserve = $currentVariables | Where-Object { $_.name -notin $VariableHash.Keys -and -not $_.IsDefaultValue }
             foreach ($var in $variableToPreserve) {
-                $newTenantCommonVariablePayloadSpat = @{
+                $newTenantCommonVariablePayloadSplat = @{
                     LibraryVariableSetId = $var.LibraryVariableSetId
                     TemplateId           = $var.TemplateId
                     Value                = $var.ValueObject
                     Scope                = $var.ScopeIds
                     VariableId           = $var.VariableId
                 }
-                $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
+                $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSplat
                 $payloads += $payload
             }
 
@@ -156,20 +156,20 @@
                 # We are updating unscoped variables only
                 # We will preserve all scoped variables as-is
                 foreach ($var in $variablesToChange | Where-Object { $_.Scope }) {
-                    $newTenantCommonVariablePayloadSpat = @{
+                    $newTenantCommonVariablePayloadSplat = @{
                         LibraryVariableSetId = $var.LibraryVariableSetId
                         TemplateId           = $var.TemplateId
                         Value                = $var.ValueObject
                         Scope                = $var.ScopeIds
                         VariableId           = $var.VariableId
                     }
-                    $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
+                    $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSplat
                     $payloads += $payload
                 }
                 # update only unscoped variables
                 foreach ($var in $variablesToChange | Where-Object { -not $_.Scope }) {
                     if ($VariableHash.Keys -contains $Var.Name) {
-                        $newTenantCommonVariablePayloadSpat = @{
+                        $newTenantCommonVariablePayloadSplat = @{
                             LibraryVariableSetId = $var.LibraryVariableSetId
                             TemplateId           = $var.TemplateId
                             Value                = $VariableHash[$var.Name]
@@ -177,7 +177,7 @@
                             Scope                = @() # unscoped
                             VariableId           = if ($var.VariableId) { $var.VariableId } else { $null }
                         }
-                        $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
+                        $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSplat
                         $payloads += $payload
                     }
                 }
@@ -190,14 +190,14 @@
             # We are updating scoped variables
             # first we preserve all unscoped variables as-is
             foreach ($var in $variablesToChange | Where-Object { -not $_.Scope -and -not $_.IsDefaultValue}) {
-                $newTenantCommonVariablePayloadSpat = @{
+                $newTenantCommonVariablePayloadSplat = @{
                     LibraryVariableSetId = $var.LibraryVariableSetId
                     TemplateId           = $var.TemplateId
                     Value                = $var.ValueObject
                     Scope                = $var.ScopeIds
                     VariableId           = $var.VariableId
                 }
-                $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
+                $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSplat
                 $payloads += $payload
             }
 
@@ -223,14 +223,14 @@
                         
                         if ($newVarScope) {
                             # update existing variable with new scope
-                            $newTenantCommonVariablePayloadSpat = @{
+                            $newTenantCommonVariablePayloadSplat = @{
                                 LibraryVariableSetId = $var.LibraryVariableSetId
                                 TemplateId           = $var.TemplateId
                                 Value                = $var.ValueObject
                                 Scope                = $newVarScope
                                 VariableId           = $var.VariableId
                             }
-                            $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
+                            $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSplat
                             $payloads += $payload
                             
                         }
@@ -245,34 +245,34 @@
                         Write-Verbose 'Keeping old variable as-is and adding new variable with updated value and target scope'
 
                         # add old variable as-is to payloads
-                        $newTenantCommonVariablePayloadSpat = @{
+                        $newTenantCommonVariablePayloadSplat = @{
                             LibraryVariableSetId = $var.LibraryVariableSetId
                             TemplateId           = $var.TemplateId
                             Value                = $var.ValueObject
                             Scope                = $var.ScopeIds
                             VariableId           = $var.VariableId
                         }
-                        $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
+                        $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSplat
                         # check the payload does not already exist before adding to $payloads
 
                        
                         $payloads += $payload
                         
                         # # add new variable with updated value and target scope
-                        # $newTenantCommonVariablePayloadSpat = @{
+                        # $newTenantCommonVariablePayloadSplat = @{
                         #     LibraryVariableSetId = $var.LibraryVariableSetId
                         #     TemplateId           = $var.TemplateId
                         #     Value                = $VariableHash[$var.Name]
                         #     IsSensitive          = $var.IsSensitive
                         #     Scope                = $comparison.NewScope
                         # }
-                        # $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
+                        # $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSplat
                         # $payloads += $payload
                         # $newVariable | Where-Object { $_.Name -eq $var.Name } | ForEach-Object { $_.Added = $true }
                     }
                     elseif ($comparison.Status -in 'Equal', 'Contained') {
                         Write-Verbose 'Updating existing variable with new value'
-                        $newTenantCommonVariablePayloadSpat = @{
+                        $newTenantCommonVariablePayloadSplat = @{
                             LibraryVariableSetId = $var.LibraryVariableSetId
                             TemplateId           = $var.TemplateId
                             Value                = $VariableHash[$var.Name]
@@ -280,38 +280,38 @@
                             Scope                = if (-not $null -eq $comparison.ExistingScope) { $($comparison.ExistingScope) }else { $($comparison.NewScope) }
                             VariableId           = $var.VariableId
                         }
-                        $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
+                        $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSplat
                         
-                        $payloads += $payload
+                        if ($payload) { $payloads += $payload }
                         $newVariable | Where-Object { $_.Name -eq $var.Name } | ForEach-Object { $_.Added = $true }
 
                     }
                     elseif ($comparison.Status -eq 'Overlap') {
                         Write-Verbose 'Updating existing variable to remove overlapping scope and adding new variable with updated value and target scope'
                         # update old variable with new scope
-                        $newTenantCommonVariablePayloadSpat = @{
+                        $newTenantCommonVariablePayloadSplat = @{
                             LibraryVariableSetId = $var.LibraryVariableSetId
                             TemplateId           = $var.TemplateId
                             Value                = $var.ValueObject
                             Scope                = $comparison.ExistingScope
                             VariableId           = $var.VariableId
                         }
-                        $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
+                        $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSplat
                         
                         $payloads += $payload
                         
 
                         # add new variable with updated value and target scope
-                        $newTenantCommonVariablePayloadSpat = @{
+                        $newTenantCommonVariablePayloadSplat = @{
                             LibraryVariableSetId = $var.LibraryVariableSetId
                             TemplateId           = $var.TemplateId
                             Value                = $VariableHash[$var.Name]
                             IsSensitive          = $var.IsSensitive
                             Scope                = $comparison.NewScope
                         }
-                        $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
+                        $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSplat
                         
-                        $payloads += $payload
+                        if ($payload) { $payloads += $payload }
                         $newVariable | Where-Object { $_.Name -eq $var.Name } | ForEach-Object { $_.Added = $true }
                     }
                     else {
@@ -324,15 +324,15 @@
             # Add any new variables that were not already added
             foreach ($nv in $newVariable | Where-Object { $_.Added -eq $false }) {
                 $varInfo = $currentVariables | Where-Object { $_.Name -eq $nv.Name } | Select-Object -First 1
-                $newTenantCommonVariablePayloadSpat = @{
+                $newTenantCommonVariablePayloadSplat = @{
                     LibraryVariableSetId = $varInfo.LibraryVariableSetId
                     TemplateId           = $varInfo.TemplateID
                     Value                = $nv.Value
                     IsSensitive          = $varInfo.IsSensitive
                     Scope                = $Environment.Id
                 }
-                $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSpat
-                $payloads += $payload
+                $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSplat
+                if ($payload) { $payloads += $payload }
             }
 
             

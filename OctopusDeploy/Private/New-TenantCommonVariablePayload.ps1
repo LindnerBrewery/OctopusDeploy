@@ -41,6 +41,9 @@
     process {
         # Handle Value
         if ($Value -isnot [Octopus.Client.Model.PropertyValueResource]) {
+            if ([string]::IsNullOrEmpty($Value)) {
+                return $null
+            }
             $Value = [Octopus.Client.Model.PropertyValueResource]::new($Value, $IsSensitive)
         }
 
