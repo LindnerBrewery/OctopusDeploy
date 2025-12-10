@@ -258,17 +258,6 @@
                        
                         $payloads += $payload
                         
-                        # # add new variable with updated value and target scope
-                        # $newTenantCommonVariablePayloadSplat = @{
-                        #     LibraryVariableSetId = $var.LibraryVariableSetId
-                        #     TemplateId           = $var.TemplateId
-                        #     Value                = $VariableHash[$var.Name]
-                        #     IsSensitive          = $var.IsSensitive
-                        #     Scope                = $comparison.NewScope
-                        # }
-                        # $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSplat
-                        # $payloads += $payload
-                        # $newVariable | Where-Object { $_.Name -eq $var.Name } | ForEach-Object { $_.Added = $true }
                     }
                     elseif ($comparison.Status -in 'Equal', 'Contained') {
                         Write-Verbose 'Updating existing variable with new value'
