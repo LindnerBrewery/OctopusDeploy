@@ -95,13 +95,10 @@
             Write-Verbose "Processing variables: $($VariableHash | ConvertTo-Json -Compress) $envString"
             ###################################################################################
             # new implementation
-            $getCommonTenantVariableSpat = @{
-                Tenant      = $Tenant
-                VariableSet = $VariableSet
-            }
+       
             
-            $currentVariables = GetCommonTenantVariable @getCommonTenantVariableSpat
-
+            $currentVariables = GetCommonTenantVariable -Tenant $Tenant
+    
 
             # Check that all the variables are defined in Variable Set
             foreach ($h in $VariableHash.GetEnumerator()) {
@@ -136,7 +133,10 @@
             $payloads = @()
             
             # Variable to preserve (not being updated)
-            $variableToPreserve = $currentVariables | Where-Object { $_.name -notin $VariableHash.Keys -and -not $_.IsDefaultValue }
+            $variableToPreserve = $currentVariables | Where-Object { ($_.name -notin $VariableHash.Keys -and -not $_.IsDefaultValue -and $_.LibraryVariableSetId -eq $VariableSet.id ) -or 
+                                                (-not $_.IsDefaultValue -and $_.LibraryVariableSetId -ne $VariableSet.id ) }
+
+           
             foreach ($var in $variableToPreserve) {
                 $newTenantCommonVariablePayloadSplat = @{
                     LibraryVariableSetId = $var.LibraryVariableSetId
