@@ -29,6 +29,59 @@ jobs:
       uses: gittools/actions/gitversion/execute@v0
       with:
         useConfigFile: true    
+    - name: Update CHANGELOG
+      shell: pwsh
+      run: |
+        $version = "${{ steps.gitversion.outputs.semVer }}"
+        $date = Get-Date -Format "yyyy-MM-dd"
+        $changelogPath = ".\CHANGELOG.md"
+        
+        Write-Host "Updating CHANGELOG.md with version $version"
+        $content = Get-Content $changelogPath -Raw
+        $content = $content -replace '## \[Unreleased\]', "## [$version] - $date"
+        Set-Content $changelogPath -Value $content -NoNewline
+        
+        Write-Host "CHANGELOG.md updated successfully"
+
+    - name: Extract current version changelog
+      id: changelog
+      shell: pwsh
+      run: |
+        $version = "${{ steps.gitversion.outputs.semVer }}"
+        $changelogPath = ".\CHANGELOG.md"
+        
+        $content = Get-Content $changelogPath -Raw
+        
+        # Extract content between current version and next version/end
+        $pattern = "(?s)## \[$version\].*?\n(.*?)(?=\n## \[|$)"
+        if ($content -match $pattern) {
+          $changelogContent = $matches[1].Trim()
+          
+          # Escape for GitHub Actions output
+          $changelogContent = $changelogContent -replace '%', '%25'
+          $changelogContent = $changelogContent -replace '\n', '%0A'
+          $changelogContent = $changelogContent -replace '\r', '%0D'
+          
+          # Use new GitHub Actions output syntax
+          "CHANGELOG_CONTENT<<EOF" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          $matches[1].Trim() | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "EOF" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          
+          Write-Host "Extracted changelog for version $version"
+        } else {
+          Write-Host "Could not extract changelog content"
+          "CHANGELOG_CONTENT=No changelog found for this version." | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        }
+
+    - name: Commit CHANGELOG changes
+      shell: pwsh
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add CHANGELOG.md
+        git diff --staged --quiet || git commit -m "Update CHANGELOG for version ${{ steps.gitversion.outputs.semVer }} [skip ci] +semver:none"
+        git push
+
     - name: publish
       shell: pwsh
       env:
@@ -67,13 +120,20 @@ jobs:
           ## OctopusDeploy Module Release v${{ steps.gitversion.outputs.semVer }}
           
           ### Installation
-          Download the zip file and extract it to your PowerShell modules directory, or install from PowerShell Gallery:
+          Install from PowerShell Gallery:
           ```powershell
           Install-Module -Name OctopusDeploy
           ```
           
-          ### Changes
-          See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+          Or download the zip file and extract it to your PowerShell modules directory.
+          
+          ### Changes in this Release
+          
+          ${{ steps.changelog.outputs.CHANGELOG_CONTENT }}
+          
+          ---
+          
+          See full [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for all changes.
         files: |
           OctopusDeploy-${{ steps.gitversion.outputs.semVer }}.zip
         draft: false

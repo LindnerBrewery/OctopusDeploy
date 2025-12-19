@@ -260,7 +260,7 @@
                         $runbookRun.TenantId = $_tenant.id
                         try {
                             Write-Verbose "Running traditional runbook snapshot for tenant '$($_tenant.Name)'"
-                            return $repo._repository.RunbookRuns.Create($runbookRun)
+                            $repo._repository.RunbookRuns.Create($runbookRun)
                         }
                         catch {
                             $PSCmdlet.WriteError($_)
@@ -271,7 +271,7 @@
                     # Execute runbook without tenant
                     try {
                         Write-Verbose "Running traditional runbook snapshot (untenanted)"
-                        return $repo._repository.RunbookRuns.Create($runbookRun)
+                        $repo._repository.RunbookRuns.Create($runbookRun)
                     }
                     catch {
                         $PSCmdlet.WriteError($_)

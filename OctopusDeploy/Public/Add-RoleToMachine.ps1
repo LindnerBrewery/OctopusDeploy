@@ -57,7 +57,13 @@
 
         if ($pscmdlet.ShouldProcess("$($Machine.name)", "$wiMessages$($role -join ', ')")) {
             foreach ($_role in $Role) {
-                $Machine.Roles.Add($_role)
+                $added = $Machine.Roles.Add($_role) 
+                if ($added){
+                    Write-Verbose "Added role $_role to machine $($Machine.Name)"
+                }
+                else {
+                    Write-Verbose "Role $_role already exists on machine $($Machine.Name)"
+                }
                 try {
                     # Modify will return an update MachineResource. Only the last one will be returned to the user
                     $lastMachineUpdate = $repo._repository.Machines.Modify($Machine)
