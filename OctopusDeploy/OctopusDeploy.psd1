@@ -111,7 +111,7 @@ PrivateData = @{
         ProjectUri = 'https://github.com/LindnerBrewery/OctopusDeploy'
 
         # A URL to an icon representing this module.
-        # IconUri = ''
+        IconUri = 'https://github.com/LindnerBrewery/OctopusDeploy/blob/main/logo.png'
 
         # ReleaseNotes of this module
         # ReleaseNotes = ''
