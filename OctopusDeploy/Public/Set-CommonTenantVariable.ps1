@@ -366,7 +366,7 @@
                         # there seems to be and issue with setting sensitive variables to empty string in overlapping scope scenario
                         # workaround is to set a value to something else first then set to empty string in a second call
                         if ($var.IsSensitive -and [string]::IsNullOrEmpty($VariableHash[$var.Name])) {
-                            Set-CommonTenantVariable @PSBoundParameters -Value 'TemporaryValueForSensitiveVariable' -Verbose:$false
+                            Set-CommonTenantVariable -Tenant $Tenant -VariableSet $VariableSet -Name $var.Name -Value 'TemporaryValueForSensitiveVariable' -Environment $Environment -Verbose:$false
                         }
 
                         # add new variable with updated value and target scope
