@@ -4,7 +4,12 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![PowerShell](https://img.shields.io/badge/PowerShell-5.1%20%7C%207%2B-blue.svg)](https://github.com/PowerShell/PowerShell)
 
-A comprehensive PowerShell wrapper around the Octopus.Client.dll library that provides a "PowerShell-friendly" interface for interacting with Octopus Deploy instances (both cloud and on-premise).
+<table>
+    <tr>
+        <td><img src="logo.png" alt="OctopusDeploy Logo" width="200" /></td>
+        <td>A comprehensive PowerShell wrapper around the Octopus.Client.dll library that provides a "PowerShell-friendly" interface for interacting with Octopus Deploy instances (both cloud and on-premise).</td>
+    </tr>
+</table>
 
 ## 🌟 Features
 

@@ -27,13 +27,13 @@ Author = 'Emrys MacInally'
 CompanyName = ''
 
 # Copyright statement for this module
-Copyright = '(c) 2024 Emrys MacInally. All rights reserved.'
+Copyright = '(c) 2026 Emrys MacInally. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Powershell wrapper around Octopus.Client.dll to help with standard problems'
+Description = 'A comprehensive PowerShell module for managing Octopus Deploy. Provides 80+ cmdlets wrapping the Octopus.Client API with PowerShell-native features including pipeline support, tab-completion, and automatic type transformation. Manage tenants, deployments, releases, runbooks, machines, variables, and more from the command line.'
 
 # Minimum version of the PowerShell engine required by this module
-# PowerShellVersion = ''
+# PowerShellVersion = '5.1'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
