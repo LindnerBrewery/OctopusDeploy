@@ -1,35 +1,65 @@
 ﻿function Set-CommonTenantVariable {
     <#
     .SYNOPSIS
-        Sets or resets a common variable for a tenant, optionally scoped to specific environments.
+        Sets or resets common tenant variables with support for environment scoping.
     .DESCRIPTION
-        This function allows you to set or reset a common variable for a specified tenant in Octopus Deploy. 
-        You can provide a single variable name and value, or a hashtable of multiple variables to set at once. 
-        Additionally, you can scope the variable to specific environments if needed.
+        This function manages common tenant variables in Octopus Deploy, allowing you to set or reset variable values 
+        with optional environment scoping. The function intelligently handles scope conflicts by comparing existing and 
+        new scopes, preserving non-overlapping values while updating target environments.
+        
+        Key features:
+        - Set single or multiple variables at once using a hashtable
+        - Scope variables to specific environments or leave unscoped
+        - Automatically handles scope conflicts (disjoint, overlapping, equal, contained)
+        - Reset variables to default by providing an empty string value
+        - Preserves all other tenant variables not being modified
+        
+        When updating scoped variables, the function compares the existing scope with the target scope:
+        - Disjoint: Keeps existing scoped value and adds new value with target scope
+        - Equal/Contained: Updates the existing variable with the new value
+        - Overlap: Splits the variable - preserves non-overlapping environments with old value, updates target environments with new value
     .PARAMETER Tenant
-        The tenant to modify.
+        The tenant to modify. Accepts tenant name, ID, or TenantResource object.
     .PARAMETER VariableSet
-        The variable set to modify.
+        The library variable set containing the common variables. Accepts variable set name, ID, or LibraryVariableSetResource object.
     .PARAMETER Name
-        The name of the variable to modify.
+        The name of the variable to modify. Used when setting a single variable.
     .PARAMETER Value
-        The new value for the variable.
+        The new value for the variable. Use an empty string ('') to reset the variable to its default value.
     .PARAMETER VariableHash
-        A hashtable of variable names and values to set multiple variables at once.
+        A hashtable of variable names and values to set multiple variables in a single operation. 
+        Example: @{Port = "1111"; IP = "1.2.3.4"}
     .PARAMETER Environment
         An array of environment names to scope the variable to. If not provided, the variable will be unscoped.
+        Accepts environment names, IDs, or EnvironmentResource objects.
     .EXAMPLE
-        Set-CommonTenantVariable -Tenant Tenant -VariableSet 'Customer Variables' -Name 'Password' -Value '123'
-        Sets the variable to 123
+        Set-CommonTenantVariable -Tenant 'Acme Corp' -VariableSet 'Customer Variables' -Name 'Password' -Value 'P@ssw0rd'
+        
+        Sets the unscoped variable 'Password' to 'P@ssw0rd' for tenant 'Acme Corp'.
     .EXAMPLE
-        Set-CommonTenantVariable -Tenant Tenant -VariableSet 'Customer Variables' -Name 'Password' -Value ''
-        Resets the variable back to default
+        Set-CommonTenantVariable -Tenant 'Acme Corp' -VariableSet 'Customer Variables' -Name 'Password' -Value ''
+        
+        Resets the 'Password' variable back to its default value.
     .EXAMPLE
-        Set-CommonTenantVariable -Tenant Tenant -VariableSet 'Customer Variables' -VariableHash @{Port = "1111"; IP  = "1.2.3.4"}
-        Sets multiple variables by passing a hashtable
+        Set-CommonTenantVariable -Tenant 'Acme Corp' -VariableSet 'Customer Variables' -VariableHash @{Port = "1111"; IP = "1.2.3.4"}
+        
+        Sets multiple unscoped variables at once using a hashtable.
     .EXAMPLE
-        Set-CommonTenantVariable -Tenant $tenant -VariableSet $variableSet -Name "DatabaseType" -Value "PostgreSQL" -Verbose -Environment $environment
-        Sets the variable scoped to a specific environment
+        Set-CommonTenantVariable -Tenant 'Acme Corp' -VariableSet 'Customer Variables' -Name 'DatabaseType' -Value 'PostgreSQL' -Environment 'Production'
+        
+        Sets the 'DatabaseType' variable to 'PostgreSQL' scoped to the Production environment only.
+    .EXAMPLE
+        Set-CommonTenantVariable -Tenant 'Acme Corp' -VariableSet 'Customer Variables' -Name 'ConnectionString' -Value 'Server=new-server' -Environment 'Test','QA','Production'
+        
+        Sets the 'ConnectionString' variable scoped to multiple environments. If the variable already has values in other environments, 
+        those will be preserved while the Test, QA, and Production environments will be updated with the new value.
+    .EXAMPLE
+        Set-CommonTenantVariable -Tenant 'Acme Corp' -VariableSet 'Customer Variables' -VariableHash @{Port = "5432"; DatabaseType = "PostgreSQL"} -Environment 'Development'
+        
+        Sets multiple variables scoped to a specific environment using a hashtable.
+    .NOTES
+        This function uses the Octopus Deploy Client API to modify tenant variables. All changes are atomic - 
+        either all variables are updated successfully or none are changed.
     #>
     [CmdletBinding()]
     param (
@@ -82,6 +112,9 @@
     }
     process {
         
+
+    
+
         try {
             # Create the variable hash if using Name/Value parameters
             if ($PSCmdlet.ParameterSetName -eq "Value") {
@@ -90,15 +123,52 @@
             }
             
             if ($PSBoundParameters['Environment']) {
-                $envString = $Environment.name -join ', ' 
+                $envString = " scoped to environments: $($Environment.name -join ', ')"
+                Write-Verbose "Processing variables for tenant '$($Tenant.Name)' in variable set '$($VariableSet.Name)'$envString"
             }
-            Write-Verbose "Processing variables: $($VariableHash | ConvertTo-Json -Compress) $envString"
-            ###################################################################################
-            # new implementation
-       
+            else {
+                Write-Verbose "Processing unscoped variables for tenant '$($Tenant.Name)' in variable set '$($VariableSet.Name)'"
+            }
+            Write-Verbose "Variables to update: $($VariableHash.Keys -join ', ')"
             
+       
+            # check the tenant has variables from the variable set passed in as a parameter
             $currentVariables = GetCommonTenantVariable -Tenant $Tenant
-    
+            if ($currentVariables.LibraryVariableSetId -notcontains $VariableSet.Id) {
+                $message = "Tenant $($Tenant.Name) does not have any variables from variable set `"$($VariableSet.Name)`""
+                $err = [System.Management.Automation.ErrorRecord]::new(
+                    [System.Management.Automation.ItemNotFoundException]::new("$message"),
+                    'NotSpecified',
+                    'InvalidData',
+                    "$($Tenant.name) / $($Variableset.name)"
+                )
+                $errorDetails = [System.Management.Automation.ErrorDetails]::new("$message")
+                $errorDetails.RecommendedAction = "Ensure tenant has variables from variable set"
+                $err.ErrorDetails = $errorDetails
+                $PSCmdlet.ThrowTerminatingError($err)
+            }
+
+            # Check that the variables to set exist in the variable set
+            $currentVarNames = ($currentVariables | Where-Object { $_.LibraryVariableSetId -eq $VariableSet.id }).Name
+            $missingVars = @()
+            foreach ($varName in $VariableHash.Keys) {
+                if ($currentVarNames -notcontains $varName) {
+                    $missingVars += $varName
+                }
+            }
+            if ($missingVars) {
+                $message = "The following variables were not found in variable set {0}: {1}" -f $VariableSet.Name, ($missingVars -join ', ')
+                $err = [System.Management.Automation.ErrorRecord]::new(
+                    [System.Management.Automation.ItemNotFoundException]::new("$message"),
+                    'NotSpecified',
+                    'InvalidData',
+                    "$($Variableset.name) / $($missingVars -join ', ')"
+                )
+                $errorDetails = [System.Management.Automation.ErrorDetails]::new("$message")
+                $errorDetails.RecommendedAction = "Check variable names exist in variable set"
+                $err.ErrorDetails = $errorDetails
+                $PSCmdlet.ThrowTerminatingError($err)
+            }
 
             # Check that all the variables are defined in Variable Set
             foreach ($h in $VariableHash.GetEnumerator()) {
@@ -133,10 +203,12 @@
             $payloads = @()
             
             # Variable to preserve (not being updated)
-            $variableToPreserve = $currentVariables | Where-Object { ($_.name -notin $VariableHash.Keys -and -not $_.IsDefaultValue -and $_.LibraryVariableSetId -eq $VariableSet.id ) -or 
-                                                (-not $_.IsDefaultValue -and $_.LibraryVariableSetId -ne $VariableSet.id ) }
+            $variableToPreserve = $currentVariables | Where-Object { ($_.name.ToLower() -notin $VariableHash.Keys.ToLower() -and -not $_.IsDefaultValue -and $_.LibraryVariableSetId -eq $VariableSet.id ) -or 
+                (-not $_.IsDefaultValue -and $_.LibraryVariableSetId -ne $VariableSet.id ) }
 
-           
+            if ($variableToPreserve) {
+                Write-Verbose "Preserving $($variableToPreserve.Count) existing variable(s)"
+            }
             foreach ($var in $variableToPreserve) {
                 $newTenantCommonVariablePayloadSplat = @{
                     LibraryVariableSetId = $var.LibraryVariableSetId
@@ -153,6 +225,7 @@
           
 
             if (-not $Environment) {
+                Write-Verbose "Updating unscoped variables only"
                 # We are updating unscoped variables only
                 # We will preserve all scoped variables as-is
                 foreach ($var in $variablesToChange | Where-Object { $_.Scope }) {
@@ -182,14 +255,17 @@
                     }
                 }
                 # Execute update using new API with all variables - any excluded variables are deleted
+                Write-Verbose "Applying $($payloads.Count) variable payload(s) to tenant '$($Tenant.Name)'"
                 $command = [Octopus.Client.Model.TenantVariables.ModifyCommonVariablesByTenantIdCommand]::new($Tenant.Id, $Tenant.SpaceId, $payloads)
                 $repo._repository.TenantVariables.Modify($command) | Out-Null
+                Write-Verbose "Successfully updated unscoped variables for tenant '$($Tenant.Name)'"
                 return # exit function as we are done handling unscoped only case
 
             }
             # We are updating scoped variables
+            Write-Verbose "Updating scoped variables"
             # first we preserve all unscoped variables as-is
-            foreach ($var in $variablesToChange | Where-Object { -not $_.Scope -and -not $_.IsDefaultValue}) {
+            foreach ($var in $variablesToChange | Where-Object { -not $_.Scope -and -not $_.IsDefaultValue }) {
                 $newTenantCommonVariablePayloadSplat = @{
                     LibraryVariableSetId = $var.LibraryVariableSetId
                     TemplateId           = $var.TemplateId
@@ -236,13 +312,11 @@
                         }
                         continue
                     }
-                    Write-Host "Existing scope env Ids: $($Var.ScopeIds -join ',')"
-                    Write-Host "Target scope env Ids: $($targetScope.EnvironmentIds -join ',')"
                     $comparison = Compare-EnvironmentScope -ExistingScope $var.ScopeIds -NewScope $Environment.id
-                    $comparison | Out-String
+                    Write-Verbose "Scope comparison for variable '$($var.Name)': $($comparison.Status)"
                     # update old variable and new variable depending on comparison result
                     if ($comparison.Status -eq 'Disjoint') {
-                        Write-Verbose 'Keeping old variable as-is and adding new variable with updated value and target scope'
+                        Write-Verbose "Variable '$($var.Name)': Keeping existing scope and adding new scoped value"
 
                         # add old variable as-is to payloads
                         $newTenantCommonVariablePayloadSplat = @{
@@ -260,7 +334,7 @@
                         
                     }
                     elseif ($comparison.Status -in 'Equal', 'Contained') {
-                        Write-Verbose 'Updating existing variable with new value'
+                        Write-Verbose "Variable '$($var.Name)': Updating existing scoped variable with new value"
                         $newTenantCommonVariablePayloadSplat = @{
                             LibraryVariableSetId = $var.LibraryVariableSetId
                             TemplateId           = $var.TemplateId
@@ -276,7 +350,7 @@
 
                     }
                     elseif ($comparison.Status -eq 'Overlap') {
-                        Write-Verbose 'Updating existing variable to remove overlapping scope and adding new variable with updated value and target scope'
+                        Write-Verbose "Variable '$($var.Name)': Splitting overlapping scope - preserving non-overlapping environments and updating target environments"
                         # update old variable with new scope
                         $newTenantCommonVariablePayloadSplat = @{
                             LibraryVariableSetId = $var.LibraryVariableSetId
@@ -289,6 +363,11 @@
                         
                         $payloads += $payload
                         
+                        # there seems to be and issue with setting sensitive variables to empty string in overlapping scope scenario
+                        # workaround is to set a value to something else first then set to empty string in a second call
+                        if ($var.IsSensitive -and [string]::IsNullOrEmpty($VariableHash[$var.Name])) {
+                            Set-CommonTenantVariable @PSBoundParameters -Value 'TemporaryValueForSensitiveVariable' -Verbose:$false
+                        }
 
                         # add new variable with updated value and target scope
                         $newTenantCommonVariablePayloadSplat = @{
@@ -326,12 +405,10 @@
 
             
             # Execute update using new API with all variables - any excluded variables are deleted
+            Write-Verbose "Applying $($payloads.Count) variable payload(s) to tenant '$($Tenant.Name)'"
             $command = [Octopus.Client.Model.TenantVariables.ModifyCommonVariablesByTenantIdCommand]::new($Tenant.Id, $Tenant.SpaceId, $payloads)
             $repo._repository.TenantVariables.Modify($command) | Out-Null
-
-        
-
-            
+            Write-Verbose "Successfully updated scoped variables for tenant '$($Tenant.Name)'"
         }
         catch {
             $PSCmdlet.ThrowTerminatingError($_)
