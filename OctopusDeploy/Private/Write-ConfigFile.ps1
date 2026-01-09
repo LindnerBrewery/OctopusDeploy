@@ -17,7 +17,7 @@ function Write-ConfigFile {
     process {
 
         # validate url. Replace with validationScript with error message when ps5.1 support is dropped
-        if ($Url.AbsoluteURI -eq $null -or $url.Scheme -notmatch '^(http|https)$') {
+        if ($null -eq $Url.AbsoluteURI -or $url.Scheme -notmatch '^(http|https)$') {
             $err = [System.Management.Automation.ErrorRecord]::new(
                 [System.UriFormatException]::new('URL is not a valid'),
                 'PSOctopusdeploy.InvalidArgument',
