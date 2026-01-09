@@ -48,7 +48,7 @@
 
 
     )
-    Begin {
+    begin {
         try {
             ValidateConnection
         }
@@ -56,18 +56,43 @@
             $PSCmdlet.ThrowTerminatingError($_)
         }
     }
-    Process {
+    process {
         $result = [System.Collections.ArrayList]::new()
         if ($PSCmdlet.ParameterSetName -eq 'default') {
             $result = $repo._repository.Tenants.getall()
         }
         if ($PSCmdlet.ParameterSetName -eq 'Name') {
             $result = $repo._repository.Tenants.findbyname("$name")
+            if ($null -eq $result) {
+                $err = [System.Management.Automation.ErrorRecord]::new(
+                    [System.Management.Automation.ItemNotFoundException]::new("Could not find a Tenant by the name of $name in space $($repo.space)"),
+                    'NotSpecified',
+                    'InvalidData',
+                    $name
+                )
+                $errorDetails = [System.Management.Automation.ErrorDetails]::new("Could not find a Tenant by the name of $name in space $($repo.space)")
+                $errorDetails.RecommendedAction = "Check you are in the right space. Use tab completion to find the tenant"
+                $err.ErrorDetails = $errorDetails
+                $PSCmdlet.WriteError($err)
+            }
         }
         if ($PSCmdlet.ParameterSetName -eq 'ID') {
             try {
                 $result = $repo._repository.Tenants.get("$id")
-            } catch {}
+                if ($null -eq $result) {
+                    $err = [System.Management.Automation.ErrorRecord]::new(
+                        [System.Management.Automation.ItemNotFoundException]::new("Could not find a Tenant w the ID of $id in space $($repo.space)"),
+                        'NotSpecified',
+                        'InvalidData',
+                        $id
+                    )
+                    $errorDetails = [System.Management.Automation.ErrorDetails]::new("Could not find a Tenant with the ID of $id in space $($repo.space)")
+                    $errorDetails.RecommendedAction = "Try useing name instead. Check you are in the right space."
+                    $err.ErrorDetails = $errorDetails
+                    $PSCmdlet.WriteError($err)
+                }
+            }
+            catch {}
 
         }
 
@@ -76,7 +101,8 @@
             # default operator is and. it will only change to or if the or switch is used
             if ($or) {
                 $operator = '-OR'
-            } else {
+            }
+            else {
                 $operator = '-AND'
             }
             [String]$filter = "`$_.Tenanttags -contains `"{0}`"" -f $Tag[0]
@@ -99,7 +125,7 @@
                         $tenant
                         break
                     }
-                 }
+                }
             }
         }
         return $result

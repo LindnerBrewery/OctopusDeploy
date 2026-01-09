@@ -50,13 +50,19 @@ class TenantTransformation : System.Management.Automation.ArgumentTransformation
 class TenantSingleTransformation : System.Management.Automation.ArgumentTransformationAttribute {
     [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
         $item = $InputData
-        if ($item -is [string] -and $item -like "Tenants-*") {
-            $item = Get-Tenant -ID "$item"
+        try {
+                  if ($item -is [string] -and $item -like "Tenants-*") {
+            $item = Get-Tenant -ID "$item" -ErrorAction stop
         }
         elseif ($item -is [string]) {
-            $item = Get-Tenant -Name "$item"
+            $item = Get-Tenant -Name "$item" -ErrorAction Stop
         }
         return ($item)
+        }
+        catch {
+            throw $_
+        }
+  
     }
 
 }

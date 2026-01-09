@@ -82,6 +82,27 @@ class ProjectDeploymentObject {
 }
 
 
+class CurrentTenantDeployment {
+    [String]$Tenant
+    [String]$Environment
+    [String]$Project
+    [String]$Version
+    [DateTime]$Date
+    [bool]$HasWarnings
+    [Octopus.Client.Model.TaskResource]$Task
+
+    # class constructors
+    CurrentTenantDeployment([String]$Tenant, [String]$Environment, [String]$Project, [String]$Version, [DateTime]$Date, [bool]$HasWarnings, [Octopus.Client.Model.TaskResource]$Task) {
+        $this.Tenant = $Tenant
+        $this.Environment = $Environment
+        $this.Project = $Project
+        $this.Version = $Version
+        $this.Date = $Date
+        $this.HasWarnings = $HasWarnings
+        $this.Task = $Task
+    }
+}
+
 class VariableSetVar {
     [String]$Name
     [String]$Value

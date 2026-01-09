@@ -35,11 +35,11 @@ function Write-ConfigFile {
         } else {
             $dataFolder = [System.Environment]::GetFolderPath('ApplicationData')
         }
-
-        $configPath = [System.IO.FileInfo]::new("$dataFolder\powershell\octopusdeploy\config.json")
-        if (-not (Test-Path -Path $configPath.DirectoryName)) {
-            Write-Verbose "Creating directory $($configPath.DirectoryName)"
-            New-Item -Path $configPath.DirectoryName -ItemType Directory -Force | Out-Null
+        $fullpath = $dataFolder + '\powershell\octopusdeploy'
+        $configPath = Join-Path $fullpath 'config.json'
+        if (-not (Test-Path -Path $fullpath)) {
+            Write-Verbose "Creating directory $fullpath"
+            New-Item -Path $fullpath -ItemType Directory -Force | Out-Null
         }
         if ($ApiKey) {
             if ($ApiKey -is [securestring]) {
