@@ -89,9 +89,11 @@
             $getRequest = [Octopus.Client.Model.TenantVariables.GetProjectVariablesByTenantIdRequest]::new($Tenant.Id, $Tenant.SpaceId)
             $allExistingVariables = $repo._repository.TenantVariables.Get($getRequest).Variables
 
+
+            $variableTemplate = $repo._repository.Tenants.GetVariables($Tenant).ProjectVariables[$Project.Id].Templates
             # Check that all the variables are defined in template
             foreach ($h in $VariableHash.GetEnumerator()) {
-                $template = $repo._repository.Tenants.GetVariables($Tenant).ProjectVariables[$Project.Id].Templates | Where-Object { $_.Name -eq $h.Name }
+                $template = $variableTemplate | Where-Object { $_.Name -eq $h.Name }
                 if (-not $template) {
                     $message = "Couldn't find variable '$($h.Name)' in project '$($Project.Name)' template. Please define it first."
                     throw $message
@@ -107,7 +109,7 @@
             # Add all existing variables (unchanged) to preserve them, except those we're updating
             $variablesToUpdate = $VariableHash.Keys
             foreach ($existingVar in $allExistingVariables) {
-                $varTemplate = $repo._repository.Tenants.GetVariables($Tenant).ProjectVariables[$Project.Id].Templates | Where-Object Id -EQ $existingVar.TemplateId
+                $varTemplate = $variableTemplate | Where-Object Id -EQ $existingVar.TemplateId
                 $isTargetVariable = $variablesToUpdate -contains $varTemplate.Name -and $Environment.Id -contains $existingVar.Scope.EnvironmentIds
 
                 if (-not $isTargetVariable) {
@@ -126,7 +128,7 @@
             # Now add/update each variable from the hash for EACH environment separately
             foreach ($h in $VariableHash.GetEnumerator()) {
                 # Get the template object. Id is needed to identify and set variable
-                $varTemplate = $repo._repository.Tenants.GetVariables($Tenant).ProjectVariables[$Project.Id].Templates | Where-Object Name -EQ $h.Name
+                $varTemplate = $variableTemplate | Where-Object Name -EQ $h.Name
 
                 # Create scope for this specific environment only
                 # $targetEnvIds = [Octopus.Client.Model.ReferenceCollection]::new()
@@ -144,7 +146,7 @@
                 $payload = [Octopus.Client.Model.TenantVariables.TenantProjectVariablePayload]::new(
                     $Project.Id,
                     $varTemplate.Id,
-                    [Octopus.Client.Model.PropertyValueResource]::new($h.Value, $false),
+                    [Octopus.Client.Model.PropertyValueResource]::new($h.Value, $($varTemplate.DefaultValue.IsSensitive)), 
                     $targetScope
                 )
                 
