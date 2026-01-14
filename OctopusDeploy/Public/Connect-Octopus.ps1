@@ -108,6 +108,7 @@
             if ($space) {
                 SetSpace -Name $Space
             }
+            Write-Host "Connected to Octopus Server: $($repo.OctopusServerURL) as User: $($repo.User) in Space: $($repo.Space)" -ForegroundColor Yellow
         }
     }
 
