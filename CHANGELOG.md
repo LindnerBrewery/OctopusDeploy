@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Set-ProjectTenantVariable**: Refactored variable template retrieval to cache the result outside loops, significantly improving performance by reducing redundant API calls. Fixed an issue where sensitive variables were not properly set by correctly passing the `IsSensitive` flag from the template to the PropertyValueResource.
+- **Get-ProjectTenantVariable**: Fixed `IsDefaultValue` logic to correctly determine when a variable is using its default value, accounting for variables with empty string values that should still be considered as set (not default).
+
+### Improved
+
+- **Connect-Octopus**: Added connection confirmation message displaying the server URL, user, and space after successful connection for better user feedback.
+
 ## [2.2.0] - 2026-01-09
 
 ### Added
