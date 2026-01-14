@@ -79,7 +79,7 @@
             $projVars.Templates | ForEach-Object { $setvar = $envScoping.Value."$($_.id)"; [pscustomobject]@{
                     Name           = $_.name
                     Value          = if ($_.DefaultValue.IsSensitive) { "*****" }else { if ($setvar.value) { $setvar.value }else { $_.DefaultValue.value } }
-                    IsDefaultValue = if ($setvar.value) { $false }else { $true }
+                    IsDefaultValue = if ($setvar) { $false }else { $true }
                     Environment    = ($allEnvs | Where-Object ID -EQ $envScoping.key).name
                 } }
         }
