@@ -266,10 +266,29 @@ class TaskSingleTransformation : System.Management.Automation.ArgumentTransforma
         if ($item -is [string] -and $item -like "ServerTasks-*") {
             $item = Get-Task -TaskID "$item"
         }
-        elseif ($item -is [string]) {
-            $item = $null
+        elseif ($item -is [Octopus.Client.Model.TaskResource]) {
+            return $item
         }
-        return ($item)
+        throw "Invalid Task input: $($item.toString())"
+    }
+}
+
+class TaskTransformation : System.Management.Automation.ArgumentTransformationAttribute {
+    [object] Transform([System.Management.Automation.EngineIntrinsics]$EngineIntrinsics, [object] $InputData) {
+        $result = @()
+        foreach ($item in $InputData) {
+            if ($item -is [string] -and $item -like "ServerTasks-*") {
+                $item = Get-Task -TaskID "$item"
+            }
+            elseif ($item -is [Octopus.Client.Model.TaskResource]) {
+                # Already a TaskResource, keep it
+            }
+            else {
+                throw "Invalid Task input: $($item.toString())"
+            }
+            $result += ($item)
+        }
+        return ($result)
     }
 }
 

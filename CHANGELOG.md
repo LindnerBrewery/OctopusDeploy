@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- **Stop-Task**: Added progress bar when cancelling multiple tasks, showing current progress and task descriptions for better user feedback.
+
+### Changed
+
+- **Stop-Task**: Enhanced `Task` parameter to accept arrays of tasks using the new `TaskTransformation` class, allowing multiple tasks to be cancelled in a single call or via pipeline.
+
+### Fixed
+
+- **Stop-Task**: Removed `ValueFromPipeline` from the `Regarding` parameter to resolve parameter set ambiguity when piping task objects. Tasks can now be piped directly to the function without conflicts.
+
 ## [2.2.1] - 2026-01-14
 
 ### Fixed
