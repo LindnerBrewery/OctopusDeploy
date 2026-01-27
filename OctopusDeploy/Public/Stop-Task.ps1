@@ -32,10 +32,10 @@ function Stop-Task {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false,
-            ValueFromPipelineByPropertyName = $true,
+            ValueFromPipeline = $true,
             ParameterSetName = 'byTask')]
-        [TaskSingleTransformation()]
-        [Octopus.Client.Model.TaskResource]
+        [TaskTransformation()]
+        [Octopus.Client.Model.TaskResource[]]
         $Task,
 
         [Parameter(Mandatory = $false,
@@ -57,7 +57,6 @@ function Stop-Task {
         $Environment,
 
         [Parameter(Mandatory = $false,
-            ValueFromPipeline = $true,
             ParameterSetName = 'byRegarding')]
         [ValidateNotNullOrEmpty()]
         [Octopus.Client.Model.Resource]
@@ -77,23 +76,27 @@ function Stop-Task {
             $PSCmdlet.ThrowTerminatingError($_)
         }
 
-        # Initialize an empty array to store tasks to cancel
-        $tasksToCancel = @() 
-
-        # Combine states into a regex pattern
-        $stateRegex = ($State -join '|') -replace ' ', ''
+        # Initialize counter for progress
+        $taskCounter = 0
+        $allTasks = @()
     }
 
     process {
+        # Initialize an empty array to store tasks to cancel
+        $tasksToCancel = @() 
+        
+        # Combine states into a regex pattern
+        $stateRegex = ($State -join '|') -replace ' ', ''
+        
         # Check the parameter set name to determine how to retrieve tasks
         if ($PSCmdlet.ParameterSetName -eq 'byTask') {
             # Cancel a specific task
-            $tasksToCancel += $Task
+            $tasksToCancel = $Task
         }
         elseif ($PSCmdlet.ParameterSetName -eq 'byRegarding') {
             # Cancel tasks regarding a specific object
             foreach ($r in $Regarding) {
-                $tasksToCancel += Get-Task -Regarding $r | Where-Object { $_.State -match $stateRegex }
+                $tasksToCancel = Get-Task -Regarding $r | Where-Object { $_.State -match $stateRegex }
             }
         }
         else {
@@ -101,11 +104,27 @@ function Stop-Task {
             $tasksToCancel = Get-Task -TaskType $TaskType -Tenant $Tenant -Environment $Environment | Where-Object { $_.State -match $stateRegex }
         }
 
-        Write-Verbose "Found $($tasksToCancel.Count) tasks to cancel."
+        # Add to collection
+        $allTasks += $tasksToCancel
+    }
 
-        # Cancel each task
-        # Todo [DNA-327]: Add progress bar for large number of tasks to give user feedback
-        foreach ($_task in $tasksToCancel) {
+    end {
+        Write-Verbose "Found $($allTasks.Count) tasks to cancel."
+
+        # Cancel each task with progress bar
+        $totalTasks = $allTasks.Count
+        foreach ($_task in $allTasks) {
+            $taskCounter++
+            
+            # Show progress bar
+            if ($totalTasks -gt 0) {
+                $percentComplete = ($taskCounter / $totalTasks) * 100
+                Write-Progress -Activity "Cancelling Tasks" `
+                    -Status "Processing task $taskCounter of $totalTasks" `
+                    -CurrentOperation "Cancelling: $($_task.Description)" `
+                    -PercentComplete $percentComplete
+            }
+            
             try {
                 Write-Verbose "Cancelling task: $($_task.Id) - $($_task.Description)"
                 $repo._repository.Tasks.Cancel($_task)
@@ -114,9 +133,10 @@ function Stop-Task {
                 Write-Warning "Failed to cancel task $($_task.Id): $_"
             }
         }
-    }
-
-    end {
         
+        # Clear the progress bar
+        if ($totalTasks -gt 0) {
+            Write-Progress -Activity "Cancelling Tasks" -Completed
+        }
     }
 }
