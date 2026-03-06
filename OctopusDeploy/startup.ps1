@@ -10,5 +10,9 @@
 #     #Add-Type -Path "$($invocation.PSScriptRoot)\Lib\$($PSVersionTable.psedition)\Octopus.Client.dll" -ErrorAction Continue
 #     Add-Type -Path "$PSScriptRoot\Lib\$($PSVersionTable.psedition)\Octopus.Client.dll" -ErrorAction Continue
 # }
-Add-Type -Path "$PSScriptRoot\Lib\$($PSVersionTable.psedition)\Octopus.Client.dll" -ErrorAction Continue
+$loaded = [System.AppDomain]::CurrentDomain.GetAssemblies() |
+    Where-Object { $_.GetName().Name -eq 'Octopus.Client' }
+if (-not $loaded) {
+    Add-Type -Path "$PSScriptRoot\Lib\$($PSVersionTable.PSEdition)\Octopus.Client.dll" -ErrorAction Continue
+}
 

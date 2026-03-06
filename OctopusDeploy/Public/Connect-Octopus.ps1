@@ -93,7 +93,7 @@
             }
             # check if octopusserverurl is reachable
             try {
-                Invoke-WebRequest $OctopusServerURL -UseBasicParsing | Out-Null
+                Invoke-WebRequest $OctopusServerURL -UseBasicParsing -TimeoutSec 10 | Out-Null
             } catch {
                 $getcustomErrorSplat = @{
                     Message   = $_.Exception.Message

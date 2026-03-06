@@ -92,7 +92,7 @@
             $result = $result | Where-Object {$Environment.id -in $_.EnvironmentIds}
         }
         if ($Role) {
-            $result = $result | Where-Object { (Compare-Object -ReferenceObject ([system.collections.Generic.List[String]]@($_.Roles)) -DifferenceObject $Role -ExcludeDifferent) }
+            $result = $result | Where-Object { $machine = $_; ($Role | Where-Object { $machine.Roles -contains $_ }).Count -eq $Role.Count }
         }
         if ($tenant) {
             $result = $result | Where-Object TenantIDs -In $Tenant.Id

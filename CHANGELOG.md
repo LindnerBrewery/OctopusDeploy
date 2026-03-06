@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- **Get-Machine**: Replaced `Compare-Object` role filtering with a simpler `-contains` check, correctly matching machines that have all specified roles.
+- **Connect-Octopus**: Added a 10-second timeout to the server reachability check (`Invoke-WebRequest`) to avoid long hangs when the server is unresponsive.
+- **startup.ps1**: DLL loading now checks whether `Octopus.Client` is already loaded in the current AppDomain before calling `Add-Type`, preventing duplicate assembly errors on re-import.
+
+### Removed
+
+- **Import-OctopusclientDll**: Removed unused private function; DLL loading is handled entirely by `startup.ps1`.
+
 ## [2.2.2] - 2026-01-27
 
 ### Added
