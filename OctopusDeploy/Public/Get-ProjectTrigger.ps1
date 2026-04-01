@@ -1,42 +1,59 @@
 ﻿function Get-ProjectTrigger {
     <#
 .SYNOPSIS
-    Returns a list of project triggers
+    Returns a list of project triggers with flexible filtering
 .DESCRIPTION
-    Retruns a list of project triggers
+    Returns project triggers (deployment and runbook). Without parameters, returns all triggers.
+    Use -Name and/or -Project to filter by trigger name (wildcard) and project.
+    Use -Tenant to return all triggers associated with a specific tenant (cannot be combined with -Name or -Project).
 .EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
+    PS C:\> Get-ProjectTrigger
+    Returns all project triggers across all projects.
+.EXAMPLE
+    PS C:\> Get-ProjectTrigger -Name "deploy"
+    Returns all triggers whose name contains "deploy".
+.EXAMPLE
+    PS C:\> Get-ProjectTrigger -Project "My Project"
+    Returns all triggers (deployment and runbook) for the specified project.
+.EXAMPLE
+    PS C:\> Get-ProjectTrigger -Project "My Project" -Name "nightly"
+    Returns triggers for the specified project whose name contains "nightly".
+.EXAMPLE
+    PS C:\> Get-ProjectTrigger -Tenant "My Tenant"
+    Returns all triggers that include the specified tenant in their tenant list.
 .INPUTS
-    Inputs (if any)
+    Octopus.Client.Model.ProjectResource
+    Octopus.Client.Model.TenantResource
 .OUTPUTS
-    Output (if any)
+    Octopus.Client.Model.ProjectTriggerResource
 .NOTES
-    General notes
+    The -Tenant parameter cannot be combined with -Name or -Project.
 #>
     [CmdletBinding(DefaultParameterSetName = "default")]
     param (
-        # Project to get the triggers from
+        # Name of a trigger. Supports wildcard matching. Returns all triggers whose name contains the specified string.
         [Parameter(mandatory = $false,
-            ParameterSetName = "byProject",
+            Position = 0,
+            ParameterSetName = "default")]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $Name,
+        # Project to get the triggers from. Can be combined with -Name.
+        [Parameter(mandatory = $false,
+            ParameterSetName = "default",
             ValueFromPipeline = $true)]
         [ValidateNotNullOrEmpty()]
         [ProjectSingleTransformation()]
         [Octopus.Client.Model.ProjectResource]
         $Project,
-        # Project trigger name
-        [Parameter(mandatory = $false,
-            Position = 0,
-            ParameterSetName = "byName",
+        # Tenant to filter triggers by. Returns triggers that include this tenant. Cannot be combined with -Name or -Project.
+        [Parameter(mandatory = $true,
+            ParameterSetName = "byTenant",
             ValueFromPipeline = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
-        $Name,
-        [Parameter(mandatory = $false,
-            ParameterSetName = "byID")]
-        [ValidateNotNullOrEmpty()]
-        [String]
-        $ID
+        [TenantSingleTransformation()]
+        [Octopus.Client.Model.TenantResource]
+        $Tenant
     )
 
     begin {
@@ -49,17 +66,21 @@
     }
 
     process {
-        $trigger = $repo._repository.ProjectTriggers.FindAll()
-        if ($PSCmdlet.ParameterSetName -eq "byProject") {
-            $trigger = $trigger | Where-Object ProjectId -EQ $Project.Id
+        $triggers = $repo._repository.ProjectTriggers.FindAll()
+
+        if ($PSCmdlet.ParameterSetName -eq "byTenant") {
+            return ($triggers | Where-Object { $_.Action.TenantIds -contains $Tenant.Id })
         }
-        if ($PSCmdlet.ParameterSetName -eq "byID") {
-            return ($trigger | Where-Object ID -EQ $ID)
+
+        if ($PSBoundParameters.ContainsKey("Project")) {
+            $triggers = $triggers | Where-Object ProjectId -EQ $Project.Id
         }
-        if ($PSCmdlet.ParameterSetName -eq "byName") {
-            return ($trigger | Where-Object Name -EQ $Name)
+
+        if ($PSBoundParameters.ContainsKey("Name")) {
+            $triggers = $triggers | Where-Object { $_.Name -like "*$Name*" }
         }
-        $trigger
+
+        $triggers
     }
 
     end {}
