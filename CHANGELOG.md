@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- **Set-ProjectTenantVariable**: `-Environment` is now optional. Without it, the unscoped value is created or updated. It also accepts multiple environments to set a single value scoped to all of them.
+
+### Fixed
+
+- **Set-ProjectTenantVariable**: Setting a value for an environment that is part of a multi-environment scope created a second, conflicting value. Existing scoped values are now adjusted: values with the same scope are updated, values whose scope is fully covered are removed, and values whose scope is partially covered keep their value for the remaining environments.
+- **Set-ProjectTenantVariable**: Environments not connected to the tenant for the project are rejected with a clear error, and `-WhatIf` is supported.
+
 ## [2.3.0] - 2026-10-15
 
 ### Fixed
