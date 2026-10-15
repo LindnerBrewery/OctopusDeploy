@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Get-ProjectTenantVariable**: Unscoped tenant variable values were not returned. Values are now read via the `TenantVariables` API, so unscoped values (set or template default) are returned alongside environment scoped values.
+
+### Changed
+
+- **Get-ProjectTenantVariable**: Output now contains one entry per set value plus the unscoped value (set or template default) instead of one entry per connected environment. The `Environment` property contains the scope's environment names (can be multiple) or `$null` for unscoped values. With `-Environment`, the value whose scope contains that environment is returned, otherwise the unscoped value.
+
 ## [2.2.2] - 2026-01-27
 
 ### Added
