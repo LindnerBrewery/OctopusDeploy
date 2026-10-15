@@ -763,8 +763,11 @@ These are template variables that each tenant can provide values for:
 # Get project tenant variables
 Get-ProjectTenantVariable -Project "My Application" -Tenant "MyTenant" -Environment Production
 
-# Set a project tenant variable
-Set-ProjectTenantVariable -Project "My Application" -Tenant "MyTenant" -Variable "ConnectionString" -Value "Server=..."
+# Set the unscoped value of a project tenant variable
+Set-ProjectTenantVariable -Project "My Application" -Tenant "MyTenant" -Name "ConnectionString" -Value "Server=..."
+
+# Set a project tenant variable scoped to one or more environments
+Set-ProjectTenantVariable -Project "My Application" -Tenant "MyTenant" -Environment Test, Production -Name "ConnectionString" -Value "Server=..."
 ```
 
 ### Common Variables (Library Variable Sets)
