@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.1] - 2026-11-27
+
+### Fixed
+
+- **Get-CommonTenantVariable**: With `-Environment`, the default value of a variable was not returned when the tenant had a value for that variable scoped to a different environment. One value per variable is now returned: the value scoped to the environment, otherwise the unscoped tenant value, otherwise the default value.
+- **Set-CommonTenantVariable**: Resetting an unscoped variable to its default with `-Value ''` failed with `Object reference not set to an instance of an object`. The unscoped value is now removed so the default applies. `-Value $null` works the same way.
+
+### Changed
+
+- **Get-CommonTenantVariable**: Returns the full variable objects, including `ScopeIds`, `TemplateID`, `IsSensitive`, `VariableId`, `LibraryVariableSetId` and `ValueObject`. `VariableSetName`, `Name`, `Value`, `IsDefaultValue` and `Scope` are still displayed by default and sensitive values are still masked.
+
+### Removed
+
+- **GetCommonTenantVariable**: The internal helper is no longer exported. Use `Get-CommonTenantVariable` instead.
+
 ## [2.4.0] - 2026-10-15
 
 ### Added
