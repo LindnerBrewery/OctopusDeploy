@@ -25,10 +25,11 @@
     .PARAMETER Name
         The name of the variable to modify. Used when setting a single variable.
     .PARAMETER Value
-        The new value for the variable. Use an empty string ('') to reset the variable to its default value.
+        The new value for the variable. Use an empty string ('') or $null to reset the variable to its default value
+        (the tenant value for the given scope, or the unscoped value if no environment is given, is deleted).
     .PARAMETER VariableHash
         A hashtable of variable names and values to set multiple variables in a single operation. 
-        Example: @{Port = "1111"; IP = "1.2.3.4"}
+        Example: @{Port = "1111"; IP = "1.2.3.4"}. A value of '' or $null resets that variable to its default value.
     .PARAMETER Environment
         An array of environment names to scope the variable to. If not provided, the variable will be unscoped.
         Accepts environment names, IDs, or EnvironmentResource objects.
@@ -86,6 +87,7 @@
         [parameter(Mandatory = $true,
             ParameterSetName = 'Value')]
         [AllowEmptyString()]
+        [AllowNull()]
         [String]$Value,
 
         [parameter(Mandatory = $true,
@@ -133,7 +135,7 @@
             
        
             # check the tenant has variables from the variable set passed in as a parameter
-            $currentVariables = GetCommonTenantVariable -Tenant $Tenant
+            $currentVariables = Get-CommonTenantVariable -Tenant $Tenant
             if ($currentVariables.LibraryVariableSetId -notcontains $VariableSet.Id) {
                 $message = "Tenant $($Tenant.Name) does not have any variables from variable set `"$($VariableSet.Name)`""
                 $err = [System.Management.Automation.ErrorRecord]::new(
@@ -251,7 +253,8 @@
                             VariableId           = if ($var.VariableId) { $var.VariableId } else { $null }
                         }
                         $payload = New-TenantCommonVariablePayload @newTenantCommonVariablePayloadSplat
-                        $payloads += $payload
+                        # an empty value returns no payload, which resets the variable to its default
+                        if ($payload) { $payloads += $payload }
                     }
                 }
                 # Execute update using new API with all variables - any excluded variables are deleted
